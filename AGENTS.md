@@ -11,7 +11,7 @@ Sehr kleine, funktionelle Markdown-SPA mit Live-Vorschau, Toolbar und Local-Firs
 Vanilla JS, **keine Build-Tools, keine Dependencies** – läuft identisch auf Linux / Windows (PWA/Tauri) / Mobile (PWA).
 
 ## Aktuelle Version
-**0.1.4** (0.x = noch nicht produktionsreif) – Details in `PLAN.md`
+**0.1.5** (0.x = noch nicht produktionsreif) – Details in `PLAN.md`
 (konsolidiert; `plan.md`/`plan_1.1.md` sind Historie).
 
 ## Kern-Entscheide (nicht ohne Grund brechen)

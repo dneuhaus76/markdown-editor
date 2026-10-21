@@ -68,6 +68,19 @@ tests/           Parser-Unit-Tests (node --test)
 6. [x] **Subskript/Superskript**: `H~2~O` → `<sub>`, `X^2^` → `<sup>`
    (Toolbar-Buttons X₂ / X², HL).
 
-## 7. Weiterer Backlog
+## 7. v0.1.5 – umgesetzt (aus ToDo.md)
+1. [x] **Bug Toggle-Verdopplung**: nur der innere Text markiert (z.B. `fett`
+   in `**fett**`) verdoppelte die Marker zu `****fett****`. Fix: `wrapSelection`
+   prüft zusätzlich die direkt an der Auswahl liegenden Marker und toggelt dann
+   ab (gilt für alle Inline-Formatierungen; Header waren bereits korrekt).
+2. [x] **Strg/Cmd+Z Rückgängig**: eigener Snapshot-Stack (max. 100), da
+   `setRangeText` die native Browser-Undo-Historie nicht erreicht; deckt
+   Tippen, Einfügen, Löschen und alle Toolbar-Aktionen ab.
+3. [x] **Print = print-optimierte Vorschau**: `beforeprint` aktiviert
+   automatisch die A4-Paginierung (auf Mobile die Vorschau-Ansicht),
+   `afterprint` stellt den vorherigen Zustand wieder her.
+4. [x] Toolbar neu sortiert (Benutzeränderung: Tabelle vor Task/Liste).
+
+## 8. Weiterer Backlog
 - (leer – offen bleiben: IndexedDB-Persistenz der Datei-Handle über Reloads,
   zeilenexaktes Sync-Scrolling)

@@ -55,6 +55,23 @@
 
   editor.addEventListener('input', () => { scheduleRender(); scheduleSave(); });
 
+  // ---------- Undo (Strg/Cmd+Z) ----------
+  // Einfacher Snapshot-Stack: setRangeText (Toolbar-Aktionen) erreicht die
+  // native Browser-Undo-Historie nicht, daher eigene Verwaltung.
+  const undoStack = [];
+  function pushUndo() {
+    undoStack.push({ value: editor.value, start: editor.selectionStart, end: editor.selectionEnd });
+    if (undoStack.length > 100) undoStack.shift();
+  }
+  function undo() {
+    const s = undoStack.pop();
+    if (!s) return;
+    editor.value = s.value;
+    editor.setSelectionRange(s.start, s.end);
+    scheduleRender(); scheduleSave();
+  }
+  editor.addEventListener('beforeinput', pushUndo); // Tippen/Einfügen/Löschen
+
   // ---------- Toolbar helpers ----------
   // Toggle wrap: if the selection is already wrapped with the same markers,
   // remove them; otherwise wrap it.
@@ -76,6 +93,7 @@
         if (m) { core = m[1]; pad = 1; }
       }
       if (core !== sel) {
+        pushUndo();
         editor.setRangeText(core, start + pad, end - pad, 'select');
         editor.focus();
         scheduleRender(); scheduleSave();
@@ -83,7 +101,19 @@
       }
     }
 
+    // Marker direkt an der Auswahl (z.B. **fett** mit nur "fett" markiert)
+    // -> Toggle off statt Verdoppeln zu ****fett****.
+    if (val.slice(start - before.length, start) === before &&
+        val.slice(end, end + after.length) === after) {
+      pushUndo();
+      editor.setRangeText(sel, start - before.length, end + after.length, 'select');
+      editor.focus();
+      scheduleRender(); scheduleSave();
+      return;
+    }
+
     const text = sel || placeholder;
+    pushUndo();
     // Nur den Inhalt (ohne Marker) markieren – sonst ersetzt der nächste Tipp alles.
     editor.setRangeText(before + text + after, start, end, 'end');
     editor.setSelectionRange(start + before.length, start + before.length + text.length);
@@ -107,6 +137,7 @@
     const lines = val.slice(lineStart, lineEnd).split('\n');
     const prefixRe = /^(#{1,6}\s+|[-*+]\s+|\d+\.\s+)/;
 
+    pushUndo();
     const allHave = lines.every(l => l.startsWith(prefix));
     const transformed = lines.map(l => {
       if (l.startsWith(prefix)) return l.slice(prefix.length); // toggle off
@@ -128,6 +159,7 @@
     const lineStart = val.lastIndexOf('\n', start - 1) + 1;
     let lineEnd = val.indexOf('\n', end);
     if (lineEnd === -1) lineEnd = val.length;
+    pushUndo();
     const transformed = val.slice(lineStart, lineEnd).split('\n')
       .map(l => (dir > 0 ? '  ' + l : l.replace(/^ {1,2}/, ''))).join('\n');
     editor.setRangeText(transformed, lineStart, lineEnd, 'end');
@@ -138,6 +170,7 @@
   function insertBlock(text) {
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
+    pushUndo();
     editor.setRangeText(text, start, end, 'end');
     editor.focus();
     scheduleRender(); scheduleSave();
@@ -152,6 +185,7 @@
     let lineEnd = val.indexOf('\n', end);
     if (lineEnd === -1) lineEnd = val.length;
     const markerRe = /^\s*(?:[-*+]|\d+\.)\s+/;
+    pushUndo();
     const transformed = val.slice(lineStart, lineEnd).split('\n').map(l => {
       const t = l.match(new RegExp(markerRe.source + '\\[[ xX]\\]\\s+'));
       if (t) return l.slice(t[0].length); // Checkbox entfernen
@@ -219,6 +253,7 @@
       if (!re.test(lines[i])) continue;
       k++;
       if (k === index) {
+        pushUndo();
         lines[i] = lines[i].replace(/\[[ xX]\]/, cb.checked ? '[x]' : '[ ]');
         editor.value = lines.join('\n');
         scheduleRender(); scheduleSave();
@@ -234,6 +269,7 @@
     if (k === 'b') { e.preventDefault(); actions.bold(); }
     if (k === 'i') { e.preventDefault(); actions.italic(); }
     if (k === 'k') { e.preventDefault(); actions.link(); }
+    if (k === 'z' && !e.shiftKey && undoStack.length) { e.preventDefault(); undo(); }
   });
 
   // ---------- Import / Export (File System Access API, Fallback Download) ----------
@@ -294,6 +330,7 @@
       try {
         const [handle] = await window.showOpenFilePicker({ types: MD_TYPES });
         const file = await handle.getFile();
+        pushUndo();
         editor.value = await file.text();
         fileHandle = handle;
         fileName = handle.name;
@@ -313,6 +350,7 @@
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
+      pushUndo();
       editor.value = String(reader.result);
       fileName = file.name; // Direktspeichern ohne Handle nicht möglich
       render(); scheduleSave();
@@ -328,6 +366,30 @@
     a4On = !a4On;
     preview.classList.toggle('a4-page', a4On);
     btnA4.classList.toggle('active', a4On);
+    render();
+  });
+
+  // ---------- Print: automatisch print-optimierte Vorschau ----------
+  // Beim Drucken (Strg+P) wird die A4-Paginierung aktiviert und auf Mobile die
+  // Vorschau-Ansicht gezeigt; nach dem Drucken wird der Zustand wiederhergestellt.
+  let printState = null;
+  window.addEventListener('beforeprint', () => {
+    printState = { a4: a4On, view: document.body.dataset.view };
+    if (!a4On) {
+      a4On = true;
+      preview.classList.add('a4-page');
+      btnA4.classList.add('active');
+    }
+    if (mobileQuery.matches) document.body.dataset.view = 'preview';
+    render();
+  });
+  window.addEventListener('afterprint', () => {
+    if (!printState) return;
+    const st = printState; printState = null;
+    a4On = st.a4;
+    preview.classList.toggle('a4-page', a4On);
+    btnA4.classList.toggle('active', a4On);
+    if (mobileQuery.matches) document.body.dataset.view = st.view;
     render();
   });
 
