@@ -40,6 +40,45 @@ test('whitelist does not leak into code spans', () => {
   assert.strictEqual(parse('```\n<u>x</u>\n```'), '<pre><code>&lt;u&gt;x&lt;/u&gt;</code></pre>');
 });
 
+test('highlight ==text==', () => {
+  assert.strictEqual(inline('==wichtig=='), '<mark>wichtig</mark>');
+  assert.strictEqual(
+    parse('Das ist ==sehr wichtig== hier.'),
+    '<p>Das ist <mark>sehr wichtig</mark> hier.</p>'
+  );
+});
+
+test('subscript ~x~ (nicht mit ~~Durchstreichen~~ verwechselt)', () => {
+  assert.strictEqual(inline('H~2~O'), 'H<sub>2</sub>O');
+  assert.strictEqual(inline('~~weg~~'), '<del>weg</del>');
+  assert.strictEqual(inline('a ~ b ~ c'), 'a ~ b ~ c'); // Leerzeichen = kein Subskript
+});
+
+test('superscript ^x^', () => {
+  assert.strictEqual(inline('X^2^'), 'X<sup>2</sup>');
+  assert.strictEqual(inline('m^2^/s^2^'), 'm<sup>2</sup>/s<sup>2</sup>');
+});
+
+test('heading id {#custom-id}', () => {
+  assert.strictEqual(
+    parse('### My Great Heading {#custom-id}'),
+    '<h3 id="custom-id">My Great Heading</h3>'
+  );
+  assert.strictEqual(parse('## Ohne Id'), '<h2>Ohne Id</h2>');
+  assert.strictEqual(parse('# Falsch { id }'), '<h1>Falsch { id }</h1>'); // kein gültiges Id
+});
+
+test('task list', () => {
+  assert.strictEqual(
+    parse('- [ ] offen\n- [x] fertig'),
+    '<ul>' +
+    '<li class="task"><input type="checkbox" data-task> offen</li>' +
+    '<li class="task"><input type="checkbox" data-task checked> fertig</li>' +
+    '</ul>'
+  );
+  assert.strictEqual(parse('- normal'), '<ul><li>normal</li></ul>');
+});
+
 test('link and image', () => {
   assert.strictEqual(
     inline('[Text](https://ex.ch)'),

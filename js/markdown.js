@@ -23,6 +23,10 @@ function inline(text) {
   out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   out = out.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
   out = out.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+  out = out.replace(/==([^=]+)==/g, '<mark>$1</mark>');
+  // Sub-/Superskript: erst nach ~~-Durchstreichen, damit Einzel-Tildas nicht kollidieren.
+  out = out.replace(/~([^~\s][^~]*)~/g, '<sub>$1</sub>');
+  out = out.replace(/\^([^^\s][^^]*)\^/g, '<sup>$1</sup>');
   return out.replace(/\x00(\d+)\x00/g, (_, n) => codes[Number(n)]);
 }
 
@@ -47,7 +51,12 @@ function buildList(lines) {
     i++;
     const nested = [];
     while (i < lines.length && lvl(lines[i]) > base) nested.push(lines[i++]);
-    html += '<li>' + inline(content) + (nested.length ? buildList(nested) : '') + '</li>';
+    // Task-Liste: - [ ] offen / - [x] fertig (Checkbox in der Vorschau ist klickbar)
+    const task = content.match(/^\[([ xX])\]\s+(.*)$/);
+    const li = task
+      ? '<li class="task"><input type="checkbox" data-task' + (/^[xX]$/.test(task[1]) ? ' checked' : '') + '> ' + inline(task[2])
+      : '<li>' + inline(content);
+    html += li + (nested.length ? buildList(nested) : '') + '</li>';
   }
   close();
   return html;
@@ -72,10 +81,14 @@ function parse(md) {
       continue;
     }
 
-    // Heading
+    // Heading (optional mit Anker-ID: ### Titel {#custom-id})
     const h = line.match(/^(#{1,6})\s+(.*)$/);
     if (h) {
-      out.push('<h' + h[1].length + '>' + inline(h[2]) + '</h' + h[1].length + '>');
+      let text = h[2];
+      let id = '';
+      const idm = text.match(/\s*\{#([A-Za-z0-9_-]+)\}\s*$/);
+      if (idm) { id = idm[1]; text = text.slice(0, text.length - idm[0].length); }
+      out.push('<h' + h[1].length + (id ? ' id="' + id + '"' : '') + '>' + inline(text) + '</h' + h[1].length + '>');
       i++;
       continue;
     }
