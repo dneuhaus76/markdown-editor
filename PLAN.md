@@ -34,7 +34,7 @@ tests/           Parser-Unit-Tests (node --test)
 | Persistenz | Auto-Save (localStorage) + Datei-Import/-Export (.md) |
 | Help | `?`-Modal: About (v1.2, Local-First), Shortcuts, Syntax-Hilfe; Esc/Klick schliesst |
 | Shortcuts | Strg/Cmd+B Fett, Strg/Cmd+I Kursiv, Strg/Cmd+K Link (Fix v1.2) |
-| Tests | 17/17 grün (`node --test`) |
+| Tests | 22/22 grün (`node --test`) |
 
 ## 4. Offene Punkte (bewusste Annahmen)
 - Kein Login/Multi-User/WYSIWYG; nur Split-View.
@@ -42,7 +42,9 @@ tests/           Parser-Unit-Tests (node --test)
 - Sync-Scrolling proportional, nicht zeilenexakt.
 - Splitter-Position pro Browser/Host (localStorage), nicht pro Dokument.
 
-## 5. v1.3 – umgesetzt (aus ToDo.md)
+## 5. v0.1.3 – umgesetzt (aus ToDo.md)
+
+> Versionsnamensgebung: `0.x` = noch nicht produktionsreif (umbenannt von v1.3).
 1. [x] **Speichern statt Download**: Export speichert direkt in die geöffnete Datei
    (File System Access API: `showOpenFilePicker` beim Laden, Handle in Session
    gehalten; `showSaveFilePicker` als Zwischenschritt; Fallback = Download).
@@ -52,6 +54,20 @@ tests/           Parser-Unit-Tests (node --test)
 4. [x] **A4-Seitenansicht**: Toolbar-Knopf `A4` zeigt die Vorschau als A4-Blatt
    (210 × 297 mm, Seitenende sichtbar, Papier-Look).
 
-## 6. Weiterer Backlog
+## 6. v0.1.4 – umgesetzt (aus ToDo.md)
+1. [x] **Bug Code-Button**: markierter Text wurde ersetzt – Button klaut den Fokus
+   (v.a. mobil), Auswahl ging verloren. Fix: `mousedown`-preventDefault an der
+   Toolbar; nach dem Wrap ist nur noch der Inhalt (ohne Marker) markiert.
+2. [x] **Bug A4**: zeigt jetzt echte Seitenbrüche – JS-Paginierung misst die
+   Blöcke und verteilt sie auf 297-mm-Blätter; dazu Print-Stylesheet
+   (`@page size: A4`), damit Drucken/PDF-Export mit der Vorschau übereinstimmt.
+3. [x] **Task-Liste**: `- [ ] Aufgabe` / `- [x] fertig`; Checkbox in der Vorschau
+   ist klickbar und toggelt die Quelle; Toolbar-Button ☑ (Toggle).
+4. [x] **Heading-ID**: `### Titel {#custom-id}` → `<h3 id="custom-id">`.
+5. [x] **Highlight**: `==text==` → `<mark>`.
+6. [x] **Subskript/Superskript**: `H~2~O` → `<sub>`, `X^2^` → `<sup>`
+   (Toolbar-Buttons X₂ / X², HL).
+
+## 7. Weiterer Backlog
 - (leer – offen bleiben: IndexedDB-Persistenz der Datei-Handle über Reloads,
   zeilenexaktes Sync-Scrolling)

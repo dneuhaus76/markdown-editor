@@ -11,14 +11,18 @@ python3 -m http.server 8080
 ```
 Alternativ: `index.html` direkt im Browser öffnen.
 
-## Features
+## Features (Version 0.1.4, 0.x = noch nicht produktionsreif)
 - Split-View: Editor links, Live-Vorschau rechts (Mobile: Umschalt-Labels)
-- Toolbar: Fett, Kursiv, Durchgestrichen, Inline-Code, Codeblock, H1–H3,
-  Liste, Tabelle, Link, Bild
+- Toolbar: Fett, Kursiv, Unterline, Durchgestrichen, Inline-Code, Codeblock,
+  Highlight (==), Sub-/Superskript, H1–H3, Liste, Task-Liste, Tabelle, Zitat,
+  Trennlinie, Link, Bild
 - Shortcuts: Strg/Cmd+B (Fett), Strg/Cmd+I (Kursiv), Strg/Cmd+K (Link)
 - Auto-Save in localStorage, Datei-Import/-Export (.md);
   mit File System Access API (Chromium) speichert Export direkt in die geöffnete Datei
-- A4-Seitenansicht (Knopf `A4`), Mobile: Wisch-Geste Editor/Vorschau
+- A4-Seitenansicht (Knopf `A4`) mit echten Seitenbrüchen + Print-Stylesheet
+  für PDF-Export, Mobile: Wisch-Geste Editor/Vorschau
+- Task-Liste (`- [ ]` / `- [x]`, Checkbox in der Vorschau klickbar),
+  Heading-IDs (`### Titel {#id}`), Highlight, Sub-/Superskript
 - Dark Mode via `prefers-color-scheme`
 
 ## Tests
