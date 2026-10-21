@@ -35,7 +35,7 @@ tests/           Parser-Unit-Tests (node --test)
 | Persistenz | Auto-Save (localStorage) + Datei-Import/-Export (.md) |
 | Help | `?`-Modal: About (v1.2, Local-First), Shortcuts, Syntax-Hilfe; Esc/Klick schliesst |
 | Shortcuts | Strg/Cmd+B Fett, Strg/Cmd+I Kursiv, Strg/Cmd+K Link (Fix v1.2) |
-| Tests | 22/22 grün (`node --test`) |
+| Tests | 23/23 grün (`node --test`) |
 
 ## 4. Offene Punkte (bewusste Annahmen)
 - Kein Login/Multi-User/WYSIWYG; nur Split-View.

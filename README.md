@@ -16,7 +16,8 @@ Alternativ: `index.html` direkt im Browser öffnen.
 - Toolbar: Fett, Kursiv, Unterline, Durchgestrichen, Inline-Code, Codeblock,
   Highlight (==), Sub-/Superskript, H1–H3, Liste, Task-Liste, Tabelle, Zitat,
   Trennlinie, Link, Bild, Dokument leeren, Seitenumbruch
-- Shortcuts: Strg/Cmd+B (Fett), Strg/Cmd+I (Kursiv), Strg/Cmd+K (Link)
+- Shortcuts: Strg/Cmd+B (Fett), Strg/Cmd+I (Kursiv), Strg/Cmd+K (Link),
+  Strg/Cmd+Z (Rückgängig), Strg/Cmd+P (Drucken mit A4-Vorschau)
 - Auto-Save in localStorage, Datei-Import/-Export (.md);
   mit File System Access API (Chromium) speichert Export direkt in die geöffnete Datei
 - A4-Seitenansicht (Knopf `A4`) mit echten Seitenbrüchen + Print-Stylesheet
