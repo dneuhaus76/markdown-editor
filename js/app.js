@@ -167,6 +167,23 @@
     scheduleRender(); scheduleSave();
   }
 
+  // Codeblock: markierter Text wird in Fences eingepackt (nicht ersetzt);
+  // bereits eingezäunte Auswahl = Toggle off; ohne Auswahl = Template.
+  function codeblockAction() {
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const sel = editor.value.slice(start, end);
+    const t = sel.match(/^```\n?([\s\S]*?)\n?```\s*$/);
+    if (t) {
+      pushUndo();
+      editor.setRangeText(t[1], start, end, 'select');
+      editor.focus();
+      scheduleRender(); scheduleSave();
+      return;
+    }
+    insertBlock('```\n' + (sel || 'code') + '\n```\n');
+  }
+
   function insertBlock(text) {
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
@@ -210,7 +227,16 @@
     underline: () => wrapSelection('<u>', '</u>', 'unterstrichen'),
     br:        () => insertBlock('<br>'),
     code:      () => wrapSelection('`', '`', 'code'),
-    codeblock: () => insertBlock('```\ncode\n```\n'),
+    codeblock: codeblockAction,
+    clear:     () => {
+      if (!editor.value) return;
+      if (!confirm('Dokument leeren? (Strg+Z = Rückgängig)')) return;
+      pushUndo();
+      editor.value = '';
+      editor.focus();
+      scheduleRender(); scheduleSave();
+    },
+    pagebreak: () => insertBlock('\n<div class="page-break"></div>\n'),
     highlight: () => wrapSelection('==', '==', 'highlight'),
     sub:       () => wrapSelection('~', '~', 'sub'),
     sup:       () => wrapSelection('^', '^', 'sup'),
