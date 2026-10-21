@@ -8,8 +8,10 @@
   const STORAGE_KEY = 'md-editor-content';
 
   // ---------- Live preview (debounced) ----------
+  let a4On = false;
   function render() {
-    preview.innerHTML = Markdown.parse(editor.value);
+    const html = Markdown.parse(editor.value);
+    preview.innerHTML = a4On ? '<div class="a4-sheet">' + html + '</div>' : html;
   }
   let renderTimer = null;
   function scheduleRender() {
@@ -157,29 +159,99 @@
     if (k === 'k') { e.preventDefault(); actions.link(); }
   });
 
-  // ---------- Import / Export ----------
-  document.getElementById('btn-export').addEventListener('click', () => {
+  // ---------- Import / Export (File System Access API, Fallback Download) ----------
+  // Handle der geöffneten Datei: wenn vorhanden, speichert Export direkt an Ort.
+  let fileHandle = null;
+  let fileName = 'dokument.md';
+  const MD_TYPES = [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } }];
+
+  function flashExport(msg) {
+    const btn = document.getElementById('btn-export');
+    const old = btn.textContent;
+    btn.textContent = '\u2713';
+    btn.title = msg;
+    setTimeout(() => { btn.textContent = old; btn.title = 'Als .md speichern'; }, 1500);
+  }
+
+  function downloadFallback() {
     const blob = new Blob([editor.value], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'dokument.md';
+    a.download = fileName;
     a.click();
     URL.revokeObjectURL(url);
-  });
+  }
 
-  document.getElementById('btn-import').addEventListener('click', () => fileInput.click());
+  async function exportFile() {
+    // 1) Direktspeichern in die geöffnete Datei
+    if (fileHandle) {
+      try {
+        const writable = await fileHandle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        flashExport('Gespeichert: ' + fileName);
+        return;
+      } catch (e) { /* Berechtigung weg – Fallback unten */ }
+    }
+    // 2) Save-Dialog, Handle merken für spätere Direktspeicherung
+    if (window.showSaveFilePicker) {
+      try {
+        fileHandle = await window.showSaveFilePicker({ suggestedName: fileName, types: MD_TYPES });
+        fileName = fileHandle.name;
+        const writable = await fileHandle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        flashExport('Gespeichert: ' + fileName);
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return; // abgesagt – nichts tun
+      }
+    }
+    // 3) Fallback: Download
+    downloadFallback();
+  }
+
+  async function importFile() {
+    if (window.showOpenFilePicker) {
+      try {
+        const [handle] = await window.showOpenFilePicker({ types: MD_TYPES });
+        const file = await handle.getFile();
+        editor.value = await file.text();
+        fileHandle = handle;
+        fileName = handle.name;
+        render(); scheduleSave();
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+    fileInput.click(); // Fallback: klassischer Dateipicker
+  }
+
+  document.getElementById('btn-export').addEventListener('click', exportFile);
+  document.getElementById('btn-import').addEventListener('click', importFile);
   fileInput.addEventListener('change', () => {
     const file = fileInput.files && fileInput.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
       editor.value = String(reader.result);
+      fileName = file.name; // Direktspeichern ohne Handle nicht möglich
       render(); scheduleSave();
     };
     reader.onerror = () => alert('Datei konnte nicht gelesen werden: ' + file.name);
     reader.readAsText(file);
     fileInput.value = '';
+  });
+
+  // ---------- A4-Seitenansicht (Toggle) ----------
+  const btnA4 = document.getElementById('btn-a4');
+  btnA4.addEventListener('click', () => {
+    a4On = !a4On;
+    preview.classList.toggle('a4-page', a4On);
+    btnA4.classList.toggle('active', a4On);
+    render();
   });
 
   // ---------- Sync scrolling (editor <-> preview) ----------
@@ -241,15 +313,33 @@
     if (e.key === 'Escape' && !helpOverlay.hidden) closeHelp();
   });
 
-  // ---------- Mobile view toggle ----------
-  if (window.matchMedia('(max-width: 768px)').matches) {
+  // ---------- Mobile view toggle (Labels + Wisch-Geste) ----------
+  const mobileQuery = window.matchMedia('(max-width: 768px)');
+  function setView(next) {
+    document.body.dataset.view = next;
+    if (next === 'preview') render();
+  }
+  if (mobileQuery.matches) {
     document.body.dataset.view = 'editor';
     document.querySelectorAll('.pane-label').forEach((el) => {
       el.addEventListener('click', () => {
-        const next = el.dataset.label === 'editor' ? 'preview' : 'editor';
-        document.body.dataset.view = next;
-        if (next === 'preview') render();
+        setView(el.dataset.label === 'editor' ? 'preview' : 'editor');
       });
+    });
+    // Horizontal wischen (> 60 px, deutlich horizontaler als vertikal) = umschalten.
+    const panesEl = document.querySelector('.panes');
+    let swipeX = null, swipeY = null;
+    panesEl.addEventListener('pointerdown', (e) => {
+      if (!mobileQuery.matches || e.pointerType === 'mouse') return;
+      swipeX = e.clientX; swipeY = e.clientY;
+    });
+    panesEl.addEventListener('pointerup', (e) => {
+      if (swipeX === null) return;
+      const dx = e.clientX - swipeX, dy = e.clientY - swipeY;
+      swipeX = swipeY = null;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        setView(document.body.dataset.view === 'preview' ? 'editor' : 'preview');
+      }
     });
   }
 

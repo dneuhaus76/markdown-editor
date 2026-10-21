@@ -30,9 +30,10 @@
     <button data-action="link" title="Link [text](url)">&#128279;</button>
     <button data-action="image" title="Bild ![alt](url)">&#128444;</button>
     <span class="spacer"></span>
-    <button id="btn-help" title="Hilfe / About">?</button>
+    <button id="btn-a4" title="A4-Seitenansicht (Seitenende anzeigen)">A4</button>
     <button id="btn-import" title="Datei .md laden">&#8682;</button>
     <button id="btn-export" title="Als .md speichern">&#8683;</button>
+    <button id="btn-help" title="Hilfe / About">?</button>
     <input type="file" id="file-input" accept=".md,.markdown,text/markdown" hidden>
   </header>
 
@@ -55,13 +56,14 @@
   <div id="help-overlay" class="help-overlay" hidden>
     <div class="help-modal" role="dialog" aria-modal="true" aria-label="Hilfe und About">
       <h2>Markdown-Editor</h2>
-      <p><b>Version 1.2</b> – Local-First: dein Text liegt nur im Browser (localStorage).
-      Tipp: Doppelklick auf die Mittellinie = 50/50.</p>
+      <p><b>Version 1.3</b> – Local-First: dein Text liegt nur im Browser (localStorage).
+      Tipp: Doppelklick auf die Mittellinie = 50/50. Mobile: horizontal wischen = Ansicht wechseln.</p>
       <h3>Shortcuts</h3>
       <table>
         <tr><td>Strg/Cmd+B</td><td>Fett</td></tr>
         <tr><td>Strg/Cmd+I</td><td>Kursiv</td></tr>
         <tr><td>Strg/Cmd+K</td><td>Link</td></tr>
+        <tr><td>Mobile: horizontal wischen</td><td>Editor / Vorschau umschalten</td></tr>
       </table>
       <h3>Syntax</h3>
       <table>

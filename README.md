@@ -15,8 +15,10 @@ Alternativ: `index.html` direkt im Browser öffnen.
 - Split-View: Editor links, Live-Vorschau rechts (Mobile: Umschalt-Labels)
 - Toolbar: Fett, Kursiv, Durchgestrichen, Inline-Code, Codeblock, H1–H3,
   Liste, Tabelle, Link, Bild
-- Shortcuts: Strg/Cmd+B (Fett), Strg/Cmd+K (Kursiv)
-- Auto-Save in localStorage, Datei-Import/-Export (.md)
+- Shortcuts: Strg/Cmd+B (Fett), Strg/Cmd+I (Kursiv), Strg/Cmd+K (Link)
+- Auto-Save in localStorage, Datei-Import/-Export (.md);
+  mit File System Access API (Chromium) speichert Export direkt in die geöffnete Datei
+- A4-Seitenansicht (Knopf `A4`), Mobile: Wisch-Geste Editor/Vorschau
 - Dark Mode via `prefers-color-scheme`
 
 ## Tests

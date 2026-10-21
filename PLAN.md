@@ -1,7 +1,7 @@
 # PLAN.md – Markdown-Editor (konsolidiert)
 
 Zusammenfassung von `plan.md` (v1.0) und `plan_1.1.md` (v1.1 + v1.2-Nachträge),
-inkl. integrierter `ToDo.md`. Ursprungsdokumente bleiben als Historie erhalten.
+inkl. integrierter `ToDo.md` (nun umgesetzt als v1.3). Ursprungsdokumente bleiben als Historie erhalten.
 
 ## 1. Auftrag & Architektur
 - Kleine, funktionelle SPA: Markdown editieren + Live-Vorschau, optionale Toolbar.
@@ -42,15 +42,16 @@ tests/           Parser-Unit-Tests (node --test)
 - Sync-Scrolling proportional, nicht zeilenexakt.
 - Splitter-Position pro Browser/Host (localStorage), nicht pro Dokument.
 
-## 5. Backlog (aus ToDo.md, Kandidaten für v1.3)
-1. **Speichern statt Download**: Offenes Dokument direkt an seinem Ort speichern,
-   statt jedes Mal herunterzuladen. Wenn eine Datei von einem Ort geöffnet wurde,
-   dort auch wieder speichern.
-   - Ansatz: File System Access API (`showOpenFilePicker`/`showSaveFilePicker`,
-     Handle in Session halten) mit Fallback auf Download/Upload.
-2. **Position des `?`-Knopfs**: oben rechts ganz aussen platzieren (Höhe
-   anpassbar – oben oder unten in der Zeile).
-3. **Mobile: Wisch-Geste** – zwischen EDITOR und VORSCHAU per Swipe umschalten
-   (ergänzt die bestehenden Umschalt-Labels).
-4. **A4-Seitenansicht (optional)**: Vorschau optional mit A4-Seitenrand/-Ende
-   anzeigen (Druck-/Seitenlayout-Vorschau).
+## 5. v1.3 – umgesetzt (aus ToDo.md)
+1. [x] **Speichern statt Download**: Export speichert direkt in die geöffnete Datei
+   (File System Access API: `showOpenFilePicker` beim Laden, Handle in Session
+   gehalten; `showSaveFilePicker` als Zwischenschritt; Fallback = Download).
+2. [x] **`?`-Knopf** oben rechts ganz aussen (nach Import/Export).
+3. [x] **Mobile: Wisch-Geste** – horizontal wischen (> 60 px) schaltet zwischen
+   EDITOR und VORSCHAU um (ergänzt die Umschalt-Labels).
+4. [x] **A4-Seitenansicht**: Toolbar-Knopf `A4` zeigt die Vorschau als A4-Blatt
+   (210 × 297 mm, Seitenende sichtbar, Papier-Look).
+
+## 6. Weiterer Backlog
+- (leer – offen bleiben: IndexedDB-Persistenz der Datei-Handle über Reloads,
+  zeilenexaktes Sync-Scrolling)
