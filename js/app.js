@@ -9,9 +9,33 @@
 
   // ---------- Live preview (debounced) ----------
   let a4On = false;
+  // A4-Paginierung: Blöcke werden gemessen und so auf Blätter verteilt, wie sie
+  // beim Drucken/PDF-Export umgebrochen würden (297 mm minus 2×20 mm Padding).
+  const MM = 96 / 25.4; // px pro mm
+  function paginateA4(html) {
+    const sheet = document.createElement('div');
+    sheet.className = 'a4-sheet a4-measure';
+    sheet.innerHTML = html;
+    preview.appendChild(sheet);
+    const cs = getComputedStyle(sheet);
+    const budget = 297 * MM - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const pages = [];
+    let cur = [], used = 0;
+    for (const el of sheet.children) {
+      const s = getComputedStyle(el);
+      const h = el.getBoundingClientRect().height + parseFloat(s.marginTop) + parseFloat(s.marginBottom);
+      if (used + h > budget && cur.length) { pages.push(cur); cur = []; used = 0; }
+      cur.push(el);
+      used += h;
+    }
+    pages.push(cur);
+    sheet.remove();
+    if (!pages.length) pages.push([]);
+    return pages.map(p => '<div class="a4-sheet">' + p.map(el => el.outerHTML).join('') + '</div>').join('\n');
+  }
   function render() {
     const html = Markdown.parse(editor.value);
-    preview.innerHTML = a4On ? '<div class="a4-sheet">' + html + '</div>' : html;
+    preview.innerHTML = a4On ? paginateA4(html) : html;
   }
   let renderTimer = null;
   function scheduleRender() {
@@ -60,7 +84,9 @@
     }
 
     const text = sel || placeholder;
-    editor.setRangeText(before + text + after, start, end, 'select');
+    // Nur den Inhalt (ohne Marker) markieren – sonst ersetzt der nächste Tipp alles.
+    editor.setRangeText(before + text + after, start, end, 'end');
+    editor.setSelectionRange(start + before.length, start + before.length + text.length);
     editor.focus();
     scheduleRender(); scheduleSave();
   }
@@ -117,6 +143,27 @@
     scheduleRender(); scheduleSave();
   }
 
+  // Task-Liste: Checkbox nach Listenzeichen ein-/ausrücken (Toggle).
+  function toggleTaskLines() {
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const val = editor.value;
+    const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+    let lineEnd = val.indexOf('\n', end);
+    if (lineEnd === -1) lineEnd = val.length;
+    const markerRe = /^\s*(?:[-*+]|\d+\.)\s+/;
+    const transformed = val.slice(lineStart, lineEnd).split('\n').map(l => {
+      const t = l.match(new RegExp(markerRe.source + '\\[[ xX]\\]\\s+'));
+      if (t) return l.slice(t[0].length); // Checkbox entfernen
+      const m = l.match(markerRe);
+      if (m) return l.slice(0, m[0].length) + '[ ] ' + l.slice(m[0].length); // Checkbox einfügen
+      return '- [ ] ' + l; // neue Task-Zeile
+    });
+    editor.setRangeText(transformed.join('\n'), lineStart, lineEnd, 'end');
+    editor.focus();
+    scheduleRender(); scheduleSave();
+  }
+
   const TABLE_TEMPLATE =
     '| Spalte 1 | Spalte 2 | Spalte 3 |\n' +
     '|----------|----------|----------|\n' +
@@ -130,6 +177,10 @@
     br:        () => insertBlock('<br>'),
     code:      () => wrapSelection('`', '`', 'code'),
     codeblock: () => insertBlock('```\ncode\n```\n'),
+    highlight: () => wrapSelection('==', '==', 'highlight'),
+    sub:       () => wrapSelection('~', '~', 'sub'),
+    sup:       () => wrapSelection('^', '^', 'sup'),
+    task:      () => toggleTaskLines(),
     hr:        () => insertBlock('\n---\n'),
     h1:        () => prefixLines('# '),
     h2:        () => prefixLines('## '),
@@ -143,11 +194,37 @@
     image:     () => wrapSelection('![', '](https://)', 'Alttext'),
   };
 
+  // Mousedown verhindern: Button klaut sonst den Fokus und die Editor-Auswahl
+  // geht verloren (v.a. mobil) – dann würde der Platzhalter statt des markierten
+  // Textes eingefügt.
+  document.querySelector('.toolbar').addEventListener('mousedown', (e) => {
+    if (e.target.closest('button[data-action]')) e.preventDefault();
+  });
   document.querySelector('.toolbar').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-action]');
     if (!btn) return;
     const fn = actions[btn.dataset.action];
     if (fn) fn();
+  });
+
+  // Task-Liste: Checkbox in der Vorschau toggelt [ ] / [x] im Editor.
+  preview.addEventListener('change', (e) => {
+    const cb = e.target.closest('input[data-task]');
+    if (!cb) return;
+    const index = Array.from(preview.querySelectorAll('input[data-task]')).indexOf(cb);
+    const re = /^\s*(?:>\s*)*(?:[-*+]|\d+\.)\s+\[[ xX]\]\s+/;
+    const lines = editor.value.split('\n');
+    let k = -1;
+    for (let i = 0; i < lines.length; i++) {
+      if (!re.test(lines[i])) continue;
+      k++;
+      if (k === index) {
+        lines[i] = lines[i].replace(/\[[ xX]\]/, cb.checked ? '[x]' : '[ ]');
+        editor.value = lines.join('\n');
+        scheduleRender(); scheduleSave();
+        return;
+      }
+    }
   });
 
   // Keyboard shortcuts: Ctrl/Cmd+B, Ctrl/Cmd+I
