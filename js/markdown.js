@@ -100,6 +100,13 @@ function parse(md) {
       continue;
     }
 
+    // Page break (block-level HTML, whitelisted; eigene Zeile)
+    if (/^\s*<div\s+class="page-break">\s*<\/div>\s*$/.test(line)) {
+      out.push('<div class="page-break"></div>');
+      i++;
+      continue;
+    }
+
     // Blockquote (recursive)
     if (/^>\s?/.test(line)) {
       const buf = [];
@@ -150,7 +157,7 @@ function parse(md) {
     const buf = [line];
     i++;
     while (i < lines.length && lines[i].trim() !== '' &&
-           !/^(#{1,6}\s|```|>\s?|\s*[-*+]\s|\s*\d+\.\s|\s*(---+|\*\*\*+)\s*$)/.test(lines[i])) {
+           !/^(#{1,6}\s|```|>\s?|\s*[-*+]\s|\s*\d+\.\s|\s*(---+|\*\*\*+)\s*$|<div\s+class="page-break")/.test(lines[i])) {
       buf.push(lines[i++]);
     }
     out.push('<p>' + inline(buf.join(' ')) + '</p>');

@@ -81,6 +81,16 @@ tests/           Parser-Unit-Tests (node --test)
    `afterprint` stellt den vorherigen Zustand wieder her.
 4. [x] Toolbar neu sortiert (Benutzeränderung: Tabelle vor Task/Liste).
 
-## 8. Weiterer Backlog
+## 8. v0.1.6 – umgesetzt (aus ToDo.md)
+1. [x] **Bug Codeblock-Button**: markierter Text wurde durch das Template ersetzt.
+   Fix: Auswahl wird in Fences eingepackt; bereits eingezäunte Auswahl
+   (```…```) = Toggle off; ohne Auswahl = Template wie bisher.
+2. [x] **Button „Dokument leeren“** (✕, rechts vor A4): leert den Editor mit
+   Bestätigungsdialog; Strg+Z macht es rückgängig.
+3. [x] **Button „Seitenumbruch“** (PB): setzt `<div class="page-break"></div>`
+   (eigene Zeile, Parser-Whitelist wie `<u>`/`<br>`); CSS `page-break-after`
+   für Print + A4-Paginierung bricht an dieser Stelle auf eine neue Seite.
+
+## 9. Weiterer Backlog
 - (leer – offen bleiben: IndexedDB-Persistenz der Datei-Handle über Reloads,
   zeilenexaktes Sync-Scrolling)

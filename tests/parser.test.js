@@ -130,6 +130,27 @@ test('horizontal rule', () => {
   assert.strictEqual(parse('---'), '<hr>');
 });
 
+test('page break (block-level HTML, whitelisted)', () => {
+  assert.strictEqual(
+    parse('<div class="page-break"></div>'),
+    '<div class="page-break"></div>'
+  );
+  assert.strictEqual(
+    parse('Seite 1\n\n<div class="page-break"></div>\n\nSeite 2'),
+    '<p>Seite 1</p>\n<div class="page-break"></div>\n<p>Seite 2</p>'
+  );
+  // bricht einen laufenden Absatz ab
+  assert.strictEqual(
+    parse('Text\n<div class="page-break"></div>\nMehr'),
+    '<p>Text</p>\n<div class="page-break"></div>\n<p>Mehr</p>'
+  );
+  // in Codeblock bleibt escaped
+  assert.strictEqual(
+    parse('```\n<div class="page-break"></div>\n```'),
+    '<pre><code>&lt;div class=&quot;page-break&quot;&gt;&lt;/div&gt;</code></pre>'
+  );
+});
+
 test('paragraph joins lines', () => {
   assert.strictEqual(parse('zeile1\nzeile2'), '<p>zeile1 zeile2</p>');
 });

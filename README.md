@@ -11,11 +11,11 @@ python3 -m http.server 8080
 ```
 Alternativ: `index.html` direkt im Browser öffnen.
 
-## Features (Version 0.1.5, 0.x = noch nicht produktionsreif)
+## Features (Version 0.1.6, 0.x = noch nicht produktionsreif)
 - Split-View: Editor links, Live-Vorschau rechts (Mobile: Umschalt-Labels)
 - Toolbar: Fett, Kursiv, Unterline, Durchgestrichen, Inline-Code, Codeblock,
   Highlight (==), Sub-/Superskript, H1–H3, Liste, Task-Liste, Tabelle, Zitat,
-  Trennlinie, Link, Bild
+  Trennlinie, Link, Bild, Dokument leeren, Seitenumbruch
 - Shortcuts: Strg/Cmd+B (Fett), Strg/Cmd+I (Kursiv), Strg/Cmd+K (Link)
 - Auto-Save in localStorage, Datei-Import/-Export (.md);
   mit File System Access API (Chromium) speichert Export direkt in die geöffnete Datei

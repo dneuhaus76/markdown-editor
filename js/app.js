@@ -22,6 +22,10 @@
     const pages = [];
     let cur = [], used = 0;
     for (const el of sheet.children) {
+      if (el.classList.contains('page-break')) {
+        if (cur.length) { pages.push(cur); cur = []; used = 0; } // erzwungener Bruch
+        continue; // die Bruchzeile selbst beansprucht keinen Platz
+      }
       const s = getComputedStyle(el);
       const h = el.getBoundingClientRect().height + parseFloat(s.marginTop) + parseFloat(s.marginBottom);
       if (used + h > budget && cur.length) { pages.push(cur); cur = []; used = 0; }

@@ -8,6 +8,7 @@
 </head>
 <body>
   <header class="toolbar" role="toolbar" aria-label="Formatierung">
+    <button data-action="clear" title="Dokument leeren" style="font-size:12px;">&#10005;</button>
     <button id="btn-import" title="Datei .md laden">&#8682;</button>
     <button id="btn-export" title="Als .md speichern">&#8683;</button>
     <span class="sep"></span>
@@ -33,6 +34,7 @@
     <button data-action="outdent" title="Ausrücken" style="font-size:12px;">&#8676;</button>
     <button data-action="quote" title="Zitat">&#10077;</button>
     <button data-action="hr" title="Trennlinie (---)" style="font-size:12px;">&#8212;</button>
+    <button data-action="pagebreak" title="Seitenumbruch (neue Seite beim Drucken)" style="font-size:12px;">PB</button>
     <span class="sep"></span>
     <button data-action="link" title="Link [text](url)">&#128279;</button>
     <button data-action="image" title="Bild ![alt](url)">&#128444;</button>
@@ -61,7 +63,7 @@
   <div id="help-overlay" class="help-overlay" hidden>
     <div class="help-modal" role="dialog" aria-modal="true" aria-label="Hilfe und About">
       <h2>Markdown-Editor</h2>
-      <p><b>Version 0.1.5</b><br>
+      <p><b>Version 0.1.6</b><br>
       Local-First: dein Text liegt nur im Browser (localStorage).
       Tipp: Doppelklick auf die Mittellinie = 50/50. Mobile: horizontal wischen = Ansicht wechseln.</p>
       <h3>Shortcuts</h3>
@@ -80,6 +82,7 @@
         <tr><td><code>- </code> (Einrücken: 2 Leerzeichen)</td><td>Liste / Unterpunkt</td></tr>
         <tr><td><code>&gt; </code></td><td>Zitat</td></tr>
         <tr><td><code>---</code></td><td>Trennlinie</td></tr>
+        <tr><td><code>&lt;div class="page-break"&gt;&lt;/div&gt;</code></td><td>Seitenumbruch (eigene Zeile, wirkt beim Drucken/A4)</td></tr>
         <tr><td><code>&lt;br&gt;</code></td><td>Zeilenumbruch</td></tr>
         <tr><td><code>[text](url)</code>, <code>![alt](url)</code></td><td>Link / Bild</td></tr>
         <tr><td><code>| a | b |</code> + <code>|---|---|</code></td><td>Tabelle</td></tr>

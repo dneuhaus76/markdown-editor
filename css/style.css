@@ -118,6 +118,7 @@ body {
 .a4-sheet pre, .a4-sheet code { background: #f0f0f3; }
 .a4-measure { position: absolute; left: -10000px; top: 0; }
 .preview-content { position: relative; }
+.preview-content .page-break { page-break-after: always; } /* erzwungener Seitenbruch (Print + A4) */
 
 /* ---------- Drucken / PDF-Export (A4) ---------- */
 @media print {
