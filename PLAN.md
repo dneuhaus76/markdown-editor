@@ -1,7 +1,8 @@
 # PLAN.md – Markdown-Editor (konsolidiert)
 
-Zusammenfassung von `plan.md` (v1.0) und `plan_1.1.md` (v1.1 + v1.2-Nachträge),
-inkl. integrierter `ToDo.md` (nun umgesetzt als v1.3). Ursprungsdokumente bleiben als Historie erhalten.
+Single Source of Truth für die Roadmap. Enthält Auftrag, aktuellen Stand, alle
+Versions-Deltas und die Historie (v1.0–v1.2) in Abschnitt 10 – die früheren
+Dokumente `plan.md` und `plan_1.1.md` sind damit integriert und gelöscht.
 
 ## 1. Auftrag & Architektur
 - Kleine, funktionelle SPA: Markdown editieren + Live-Vorschau, optionale Toolbar.
@@ -94,3 +95,56 @@ tests/           Parser-Unit-Tests (node --test)
 ## 9. Weiterer Backlog
 - (leer – offen bleiben: IndexedDB-Persistenz der Datei-Handle über Reloads,
   zeilenexaktes Sync-Scrolling)
+
+## 10. Historie (v1.0–v1.2, aus `plan.md` und `plan_1.1.md`)
+
+### 10.1 v1.0 – Ursprung (plan.md)
+- **Auftrag**: sehr kleine, funktionelle SPA: Markdown editieren + Live-Vorschau,
+  optionale Toolbar; heute Linux, aber so aufgebaut, dass Mobile und Windows
+  gleichwertig daraus entstehen können.
+- **Architektur-Entscheid**: Web-basiert, Vanilla JS, keine Build-Tools/Frameworks;
+  Windows später via PWA/Tauri, Mobile via PWA. Parser: Mini-Parser statt Library
+  (Default war `marked.js`, beim Umsetzen auf Mini-Parser reduziert).
+- **MVP-Scope**: Split-View (Mobile: Toggle), Toolbar (Fett, Kursiv, Durchgestrichen,
+  Inline-Code, Link, Bild, Liste, Tabelle, H1–H3, Codeblock), Live-Vorschau
+  (debounced ~150 ms), Auto-Save (localStorage) + Datei-Import/-Export.
+- **Parser-Scope (bewusst klein)**: Überschriften, Fett/Kursiv/Durchgestrichen,
+  Inline-Code, Codeblocks, Links, Bilder, Listen, Tabellen, Zitate, Trennlinie,
+  Absätze. Nicht (vorerst): Fussnoten, Mathematik, verschachtelte Aufgabenlisten.
+- **Plattform-Strategie**: keine Desktop-spezifische API, Touch-Targets ≥ 40 px,
+  responsive Breakpoint 768 px. UI-Sprache Deutsch (de_CH).
+- **Meilensteine (alle erledigt)**: Grundgerüst, Mini-Parser + Tests (13/13),
+  Live-Vorschau, Toolbar-Actions, Auto-Save + Import/Export, README + Starttest.
+
+### 10.2 v1.1 – Delta (plan_1.1.md)
+- **Sync-Scrolling**: bidirektional, proportionales Mapping
+  (`ratio = scrollTop / (scrollHeight - clientHeight)`), Echo-Erkennung statt Flag,
+  rAF-gedämpft; auf Mobile inaktiv.
+- **Toolbar-Toggle**: zweiter Klick entfernt dieselbe Formatierung
+  (Inline-Wrap: Marker direkt an der Auswahl entfernen; Zeilenpräfixe: gleiches
+  Präfix entfernen, anderes derselben Art ersetzen); Codeblock/Tabelle bleiben
+  Insertion (Codeblock wurde in v0.1.6 um ein Wrap/Toggle ergänzt).
+- **Neue Actions**: Unterline `<u>`, Zeilenumbruch `<br>`, Trennlinie `---`.
+- **Parser**: Inline-HTML-Whitelist (`<u>`, `</u>`, `<br>`, `<br/>`), nach
+  HTML-Escape wiederhergestellt; unbekannte Tags bleiben escaped.
+- **Splitter**: `.splitter`-Div (Pointer Events, auch Touch), Breite via
+  CSS-Variable `--split`, Clamp 20–80 %, Doppelklick = 50/50, Position in
+  localStorage; feine dezente Trennlinie; Editor-Scrollbar ausgeblendet
+  (Firefox + WebKit), Vorschau-Scrollbar bleibt sichtbar.
+- **Tests**: 16/16 grün; Toolbar-Toggle manuell geprüft (kein DOM-Test-Framework).
+
+### 10.3 v1.2 – Nachträge (plan_1.1.md, Abschnitt 9)
+- **Zitat-Knopf `>`** (Toggle auf Präfix `> `).
+- **Verschachtelte Listen**: Einrückungsstufen (2 Leerzeichen/Tab = 1 Stufe,
+  beliebig tief), Stack-basiert; CSS `padding-left: 1.4em`; Ein-/Ausrücken-Knöpfe.
+- **Help/About-Modal** (`?`-Knopf): Version, Local-First-Hinweis, Shortcuts,
+  Syntax-Tabelle; Esc/Klick draussen schliesst.
+- **Shortcut-Fix**: Strg+I = Kursiv, Strg+K = Link (vorher vertauscht/inaktiv).
+- **Tests**: 17/17 grün.
+
+### 10.4 Parser-Entscheidung (beurteilt am 2025-er Stand, gilt weiter)
+**Mini-Parser + Whitelist bleibt.** Kontrolliertes kleines Tag-Vokabular,
+0 Dependencies, vollständig vorhersagbar, kein XSS-Fall. Migrations-Auslöser
+(`markdown-it`, ~14 kB, `parse()`-API bleibt gleich): mehr Inline-HTML/Attribute,
+Fussnoten, Mathematik, CommonMark-Edge-Cases, Plugin-Bedarf. `DOMPurify` erst
+bei beliebigem HTML.

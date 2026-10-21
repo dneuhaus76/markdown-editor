@@ -12,7 +12,7 @@ Vanilla JS, **keine Build-Tools, keine Dependencies** – läuft identisch auf L
 
 ## Aktuelle Version
 **0.1.6** (0.x = noch nicht produktionsreif) – Details in `PLAN.md`
-(konsolidiert; `plan.md`/`plan_1.1.md` sind Historie).
+(konsolidiert, inkl. Historie v1.0–v1.2 in Abschnitt 10).
 
 ## Kern-Entscheide (nicht ohne Grund brechen)
 - **Mini-Parser `js/markdown.js` + Inline-HTML-Whitelist** (`<u>`, `<br>`), 0 Dependencies.
