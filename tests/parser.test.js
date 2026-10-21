@@ -1,0 +1,105 @@
+// Unit tests for the minimal Markdown parser (run: node --test tests/)
+const { test } = require('node:test');
+const assert = require('node:assert');
+const { parse, inline } = require('../js/markdown.js');
+
+test('headings h1-h3', () => {
+  assert.strictEqual(parse('# Titel'), '<h1>Titel</h1>');
+  assert.strictEqual(parse('## Sub'), '<h2>Sub</h2>');
+  assert.strictEqual(parse('### Subsub'), '<h3>Subsub</h3>');
+});
+
+test('bold / italic / strikethrough', () => {
+  assert.strictEqual(inline('**fett**'), '<strong>fett</strong>');
+  assert.strictEqual(inline('*kursiv*'), '<em>kursiv</em>');
+  assert.strictEqual(inline('~~weg~~'), '<del>weg</del>');
+});
+
+test('inline code is not formatted inside', () => {
+  assert.strictEqual(inline('`**code**`'), '<code>**code**</code>');
+});
+
+test('html escaping', () => {
+  assert.strictEqual(inline('<b>&"x"</b>'), '&lt;b&gt;&amp;&quot;x&quot;&lt;/b&gt;');
+});
+
+test('whitelisted inline html: underline', () => {
+  assert.strictEqual(inline('<u>Text</u>'), '<u>Text</u>');
+  assert.strictEqual(parse('vor <u>fett **und**</u> nach'), '<p>vor <u>fett <strong>und</strong></u> nach</p>');
+  assert.strictEqual(parse('- <u>a</u>'), '<ul><li><u>a</u></li></ul>');
+});
+
+test('whitelisted inline html: br', () => {
+  assert.strictEqual(inline('Zeile 1<br>Zeile 2'), 'Zeile 1<br>Zeile 2');
+  assert.strictEqual(inline('a<br/>b'), 'a<br>b');
+  assert.strictEqual(parse('Zeile 1<br>Zeile 2'), '<p>Zeile 1<br>Zeile 2</p>');
+});
+
+test('whitelist does not leak into code spans', () => {
+  assert.strictEqual(inline('`<u>`'), '<code>&lt;u&gt;</code>');
+  assert.strictEqual(parse('```\n<u>x</u>\n```'), '<pre><code>&lt;u&gt;x&lt;/u&gt;</code></pre>');
+});
+
+test('link and image', () => {
+  assert.strictEqual(
+    inline('[Text](https://ex.ch)'),
+    '<a href="https://ex.ch" target="_blank" rel="noopener">Text</a>'
+  );
+  assert.strictEqual(inline('![Alt](img.png)'), '<img src="img.png" alt="Alt">');
+});
+
+test('fenced code block', () => {
+  assert.strictEqual(parse('```\na < b\n```'), '<pre><code>a &lt; b</code></pre>');
+});
+
+test('unordered and ordered lists', () => {
+  assert.strictEqual(parse('- a\n- b'), '<ul><li>a</li><li>b</li></ul>');
+  assert.strictEqual(parse('1. a\n2. b'), '<ol><li>a</li><li>b</li></ol>');
+});
+
+test('nested lists via indentation', () => {
+  assert.strictEqual(
+    parse('- a\n  - b'),
+    '<ul><li>a<ul><li>b</li></ul></li></ul>'
+  );
+  assert.strictEqual(
+    parse('- a\n- b\n  - c'),
+    '<ul><li>a</li><li>b<ul><li>c</li></ul></li></ul>'
+  );
+  assert.strictEqual(
+    parse('1. a\n   1. b'),
+    '<ol><li>a<ol><li>b</li></ol></li></ol>'
+  );
+  assert.strictEqual(
+    parse('- a\n  - b\n    - c\n  - d'),
+    '<ul><li>a<ul><li>b<ul><li>c</li></ul></li><li>d</li></ul></li></ul>'
+  );
+});
+
+test('table', () => {
+  const md = '| A | B |\n|---|---|\n| 1 | 2 |';
+  const html = parse(md);
+  assert.match(html, /<table><thead><tr><th>A<\/th><th>B<\/th><\/tr><\/thead>/);
+  assert.match(html, /<tbody><tr><td>1<\/td><td>2<\/td><\/tr><\/tbody><\/table>/);
+});
+
+test('blockquote', () => {
+  assert.strictEqual(parse('> Zitat'), '<blockquote><p>Zitat</p></blockquote>');
+});
+
+test('horizontal rule', () => {
+  assert.strictEqual(parse('---'), '<hr>');
+});
+
+test('paragraph joins lines', () => {
+  assert.strictEqual(parse('zeile1\nzeile2'), '<p>zeile1 zeile2</p>');
+});
+
+test('empty input', () => {
+  assert.strictEqual(parse(''), '');
+});
+
+test('non-string input throws', () => {
+  assert.throws(() => parse(null), TypeError);
+  assert.throws(() => parse(42), TypeError);
+});

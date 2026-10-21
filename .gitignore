@@ -1,0 +1,5 @@
+# Snapshots
+*.tar.gz
+
+# OS
+.DS_Store
