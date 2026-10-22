@@ -1,3 +1,4 @@
+// Markdown-Editor – GPL-3.0 (see LICENSE)
 // Minimal Markdown parser (line-based, no dependencies).
 // Supports: headings, bold/italic/strikethrough, inline code, fenced code blocks,
 // links, images, unordered/ordered lists, tables, blockquotes, hr, paragraphs.

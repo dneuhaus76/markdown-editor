@@ -33,6 +33,9 @@ docker run -d --name markdown-editor --restart unless-stopped -p 8080:80 markdow
   heading IDs (`### Title {#id}`), highlight, sub/superscript
 - Dark mode via `prefers-color-scheme`
 
+## License
+GPL-3.0 (copyleft) – see [LICENSE](LICENSE).
+
 ## Tests
 ```bash
 node --test

@@ -1,3 +1,4 @@
+// Markdown-Editor – GPL-3.0 (see LICENSE)
 // App logic: live preview, toolbar actions, autosave, import/export.
 (function () {
   'use strict';
