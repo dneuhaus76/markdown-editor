@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de-CH">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,41 +7,41 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header class="toolbar" role="toolbar" aria-label="Formatierung">
-    <button data-action="clear" title="Dokument leeren" style="font-size:12px;">&#10005;</button>
-    <button id="btn-import" title="Datei .md laden">&#8682;</button>
-    <button id="btn-export" title="Als .md speichern">&#8683;</button>
+  <header class="toolbar" role="toolbar" aria-label="Formatting">
+    <button data-action="clear" title="Clear document" style="font-size:12px;">&#10005;</button>
+    <button id="btn-import" title="Open .md file">&#8682;</button>
+    <button id="btn-export" title="Save as .md">&#8683;</button>
     <span class="sep"></span>
-    <button data-action="bold" title="Fett (Strg+B)"><b>B</b></button>
-    <button data-action="italic" title="Kursiv (Strg+I)"><i>I</i></button>
-    <button data-action="underline" title="Unterline"><u>U</u></button>
-    <button data-action="strike" title="Durchgestrichen"><s>S</s></button>
-    <button data-action="code" title="Inline-Code">&lt;/&gt;</button>
-    <button data-action="codeblock" title="Codeblock">{ }</button>
+    <button data-action="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button data-action="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button data-action="underline" title="Underline"><u>U</u></button>
+    <button data-action="strike" title="Strikethrough"><s>S</s></button>
+    <button data-action="code" title="Inline code">&lt;/&gt;</button>
+    <button data-action="codeblock" title="Code block">{ }</button>
     <button data-action="highlight" title="Highlight (==text==)" style="font-size:12px;">HL</button>
-    <button data-action="sup" title="Superskript (X^2^)">X<sup>2</sup></button>
-    <button data-action="sub" title="Subskript (H~2~O)">X<sub>2</sub></button>
+    <button data-action="sup" title="Superscript (X^2^)">X<sup>2</sup></button>
+    <button data-action="sub" title="Subscript (H~2~O)">X<sub>2</sub></button>
     <span class="sep"></span>
-    <button data-action="h1" title="Überschrift 1">H1</button>
-    <button data-action="h2" title="Überschrift 2">H2</button>
-    <button data-action="h3" title="Überschrift 3">H3</button>
+    <button data-action="h1" title="Heading 1">H1</button>
+    <button data-action="h2" title="Heading 2">H2</button>
+    <button data-action="h3" title="Heading 3">H3</button>
     <span class="sep"></span>
-    <button data-action="table" title="Tabelle">&#9633;</button>
-    <button data-action="task" title="Task-Liste (- [ ] Aufgabe)">&#9745;</button>
-    <button data-action="ul" title="Liste">&#8226;&ndash;</button>
-    <button data-action="indent" title="Einrücken" style="font-size:12px;">&#8677;</button>
-    <button data-action="outdent" title="Ausrücken" style="font-size:12px;">&#8676;</button>
-    <button data-action="quote" title="Zitat">&#10077;</button>
+    <button data-action="table" title="Table">&#9633;</button>
+    <button data-action="task" title="Task list (- [ ] task)">&#9745;</button>
+    <button data-action="ul" title="List">&#8226;&ndash;</button>
+    <button data-action="indent" title="Indent" style="font-size:12px;">&#8677;</button>
+    <button data-action="outdent" title="Outdent" style="font-size:12px;">&#8676;</button>
+    <button data-action="quote" title="Quote">&#10077;</button>
     <button data-action="link" title="Link [text](url)">&#128279;</button>
-    <button data-action="image" title="Bild ![alt](url)">&#128444;</button>
-    <button data-action="hr" title="Trennlinie (---)" style="font-size:12px;">&#8212;</button>
+    <button data-action="image" title="Image ![alt](url)">&#128444;</button>
+    <button data-action="hr" title="Horizontal rule (---)" style="font-size:12px;">&#8212;</button>
     <span class="sep"></span>
-    <button data-action="br" title="Zeilenumbruch (br)" style="font-size:12px;">br</button>
-    <button data-action="pagebreak" title="Seitenumbruch (neue Seite beim Drucken)" style="font-size:12px;">PB</button>
+    <button data-action="br" title="Line break (br)" style="font-size:12px;">br</button>
+    <button data-action="pagebreak" title="Page break (new page when printing)" style="font-size:12px;">PB</button>
     <span class="sep"></span>
-    <button id="btn-a4" title="A4-Seitenansicht (Seitenende anzeigen)">A4</button>
+    <button id="btn-a4" title="A4 page view (show page end)">A4</button>
     <span class="spacer"></span>
-    <button id="btn-help" title="Hilfe / About">?</button>
+    <button id="btn-help" title="Help / About">?</button>
     <input type="file" id="file-input" accept=".md,.markdown,text/markdown" hidden>
   </header>
 
@@ -50,49 +50,49 @@
       <div class="pane-header">
         <span class="pane-label" data-label="editor">Editor</span>
       </div>
-      <textarea id="editor" spellcheck="false" placeholder="Hier Markdown schreiben..."></textarea>
+      <textarea id="editor" spellcheck="false" placeholder="Write Markdown here..."></textarea>
     </div>
-    <div class="splitter" id="splitter" title="Ziehen zum Verstellen, Doppelklick = 50/50"></div>
+    <div class="splitter" id="splitter" title="Drag to resize, double-click = 50/50"></div>
     <div class="pane pane-preview">
       <div class="pane-header">
-        <span class="pane-label" data-label="preview">Vorschau</span>
+        <span class="pane-label" data-label="preview">Preview</span>
       </div>
       <div id="preview" class="preview-content"></div>
     </div>
   </main>
 
   <div id="help-overlay" class="help-overlay" hidden>
-    <div class="help-modal" role="dialog" aria-modal="true" aria-label="Hilfe und About">
+    <div class="help-modal" role="dialog" aria-modal="true" aria-label="Help and About">
       <h2>Markdown-Editor</h2>
       <p><b>Version 0.1.6</b><br>
-      Local-First: dein Text liegt nur im Browser (localStorage).
-      Tipp: Doppelklick auf die Mittellinie = 50/50. Mobile: horizontal wischen = Ansicht wechseln.</p>
+      Local-first: your text stays in the browser only (localStorage).
+      Tip: double-click the middle line = 50/50. Mobile: swipe horizontally = switch view.</p>
       <h3>Shortcuts</h3>
       <table>
-        <tr><td>Strg/Cmd+B</td><td>Fett</td></tr>
-        <tr><td>Strg/Cmd+I</td><td>Kursiv</td></tr>
-        <tr><td>Strg/Cmd+K</td><td>Link</td></tr>
-        <tr><td>Strg/Cmd+Z</td><td>Rückgängig</td></tr>
-        <tr><td>Strg/Cmd+P</td><td>Drucken (automatisch A4-Vorschau)</td></tr>
-        <tr><td>Mobile: horizontal wischen</td><td>Editor / Vorschau umschalten</td></tr>
+        <tr><td>Ctrl/Cmd+B</td><td>Bold</td></tr>
+        <tr><td>Ctrl/Cmd+I</td><td>Italic</td></tr>
+        <tr><td>Ctrl/Cmd+K</td><td>Link</td></tr>
+        <tr><td>Ctrl/Cmd+Z</td><td>Undo</td></tr>
+        <tr><td>Ctrl/Cmd+P</td><td>Print (automatic A4 preview)</td></tr>
+        <tr><td>Mobile: swipe horizontally</td><td>Toggle editor / preview</td></tr>
       </table>
       <h3>Syntax</h3>
       <table>
-        <tr><td><code>**fett**</code>, <code>*kursiv*</code>, <code>~~weg~~</code>, <code>&lt;u&gt;unter&lt;/u&gt;</code></td><td>Textformatierung</td></tr>
-        <tr><td><code># </code> … <code>### </code></td><td>Überschrift</td></tr>
-        <tr><td><code>- </code> (Einrücken: 2 Leerzeichen)</td><td>Liste / Unterpunkt</td></tr>
-        <tr><td><code>&gt; </code></td><td>Zitat</td></tr>
-        <tr><td><code>---</code></td><td>Trennlinie</td></tr>
-        <tr><td><code>&lt;div class="page-break"&gt;&lt;/div&gt;</code></td><td>Seitenumbruch (eigene Zeile, wirkt beim Drucken/A4)</td></tr>
-        <tr><td><code>&lt;br&gt;</code></td><td>Zeilenumbruch</td></tr>
-        <tr><td><code>[text](url)</code>, <code>![alt](url)</code></td><td>Link / Bild</td></tr>
-        <tr><td><code>| a | b |</code> + <code>|---|---|</code></td><td>Tabelle</td></tr>
-        <tr><td><code>==markiert==</code>, <code>H~2~O</code>, <code>X^2^</code></td><td>Highlight / Subskript / Superskript</td></tr>
-        <tr><td><code>- [ ] Aufgabe</code> / <code>- [x] fertig</code></td><td>Task-Liste (Checkbox in Vorschau anklickbar)</td></tr>
-        <tr><td><code>### Titel {#id}</code></td><td>Überschrift mit Anker-ID</td></tr>
+        <tr><td><code>**bold**</code>, <code>*italic*</code>, <code>~~gone~~</code>, <code>&lt;u&gt;under&lt;/u&gt;</code></td><td>Text formatting</td></tr>
+        <tr><td><code># </code> … <code>### </code></td><td>Heading</td></tr>
+        <tr><td><code>- </code> (indent: 2 spaces)</td><td>List / sub-item</td></tr>
+        <tr><td><code>&gt; </code></td><td>Quote</td></tr>
+        <tr><td><code>---</code></td><td>Horizontal rule</td></tr>
+        <tr><td><code>&lt;div class="page-break"&gt;&lt;/div&gt;</code></td><td>Page break (own line, applies when printing/A4)</td></tr>
+        <tr><td><code>&lt;br&gt;</code></td><td>Line break</td></tr>
+        <tr><td><code>[text](url)</code>, <code>![alt](url)</code></td><td>Link / image</td></tr>
+        <tr><td><code>| a | b |</code> + <code>|---|---|</code></td><td>Table</td></tr>
+        <tr><td><code>==highlighted==</code>, <code>H~2~O</code>, <code>X^2^</code></td><td>Highlight / subscript / superscript</td></tr>
+        <tr><td><code>- [ ] task</code> / <code>- [x] done</code></td><td>Task list (checkbox clickable in preview)</td></tr>
+        <tr><td><code>### Title {#id}</code></td><td>Heading with anchor ID</td></tr>
       </table>
       <br>
-      <button id="help-close">Schliessen</button>
+      <button id="help-close">Close</button>
     </div>
   </div>
 

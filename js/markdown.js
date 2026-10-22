@@ -24,7 +24,7 @@ function inline(text) {
   out = out.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
   out = out.replace(/~~([^~]+)~~/g, '<del>$1</del>');
   out = out.replace(/==([^=]+)==/g, '<mark>$1</mark>');
-  // Sub-/Superskript: erst nach ~~-Durchstreichen, damit Einzel-Tildas nicht kollidieren.
+  // Sub/superscript: after ~~strikethrough~~ so single tildas do not collide.
   out = out.replace(/~([^~\s][^~]*)~/g, '<sub>$1</sub>');
   out = out.replace(/\^([^^\s][^^]*)\^/g, '<sup>$1</sup>');
   return out.replace(/\x00(\d+)\x00/g, (_, n) => codes[Number(n)]);
@@ -51,7 +51,7 @@ function buildList(lines) {
     i++;
     const nested = [];
     while (i < lines.length && lvl(lines[i]) > base) nested.push(lines[i++]);
-    // Task-Liste: - [ ] offen / - [x] fertig (Checkbox in der Vorschau ist klickbar)
+    // Task list: - [ ] open / - [x] done (checkbox is clickable in the preview)
     const task = content.match(/^\[([ xX])\]\s+(.*)$/);
     const li = task
       ? '<li class="task"><input type="checkbox" data-task' + (/^[xX]$/.test(task[1]) ? ' checked' : '') + '> ' + inline(task[2])
@@ -81,7 +81,7 @@ function parse(md) {
       continue;
     }
 
-    // Heading (optional mit Anker-ID: ### Titel {#custom-id})
+    // Heading (optional anchor ID: ### Title {#custom-id})
     const h = line.match(/^(#{1,6})\s+(.*)$/);
     if (h) {
       let text = h[2];
@@ -100,7 +100,7 @@ function parse(md) {
       continue;
     }
 
-    // Page break (block-level HTML, whitelisted; eigene Zeile)
+    // Page break (block-level HTML, whitelisted; own line)
     if (/^\s*<div\s+class="page-break">\s*<\/div>\s*$/.test(line)) {
       out.push('<div class="page-break"></div>');
       i++;

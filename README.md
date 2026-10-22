@@ -1,7 +1,7 @@
 # Markdown-Editor
 
-Sehr kleiner, funktionaler Markdown-Editor mit Live-Vorschau und Toolbar.
-Kein Framework, keine Build-Tools, keine Dependencies (Vanilla JS + CSS).
+Very small, functional Markdown editor with live preview and toolbar.
+No framework, no build tools, no dependencies (Vanilla JS + CSS).
 
 ## Start (Linux)
 ```bash
@@ -9,38 +9,38 @@ cd markdown-editor
 python3 -m http.server 8080
 # Browser: http://localhost:8080
 ```
-Alternativ: `index.html` direkt im Browser öffnen.
+Alternatively: open `index.html` directly in the browser.
 
-## Features (Version 0.1.6, 0.x = noch nicht produktionsreif)
-- Split-View: Editor links, Live-Vorschau rechts (Mobile: Umschalt-Labels)
-- Toolbar: Fett, Kursiv, Unterline, Durchgestrichen, Inline-Code, Codeblock,
-  Highlight (==), Sub-/Superskript, H1–H3, Liste, Task-Liste, Tabelle, Zitat,
-  Trennlinie, Link, Bild, Dokument leeren, Seitenumbruch
-- Shortcuts: Strg/Cmd+B (Fett), Strg/Cmd+I (Kursiv), Strg/Cmd+K (Link),
-  Strg/Cmd+Z (Rückgängig), Strg/Cmd+P (Drucken mit A4-Vorschau)
-- Auto-Save in localStorage, Datei-Import/-Export (.md);
-  mit File System Access API (Chromium) speichert Export direkt in die geöffnete Datei
-- A4-Seitenansicht (Knopf `A4`) mit echten Seitenbrüchen + Print-Stylesheet
-  für PDF-Export, Mobile: Wisch-Geste Editor/Vorschau
-- Task-Liste (`- [ ]` / `- [x]`, Checkbox in der Vorschau klickbar),
-  Heading-IDs (`### Titel {#id}`), Highlight, Sub-/Superskript
-- Dark Mode via `prefers-color-scheme`
+## Features (Version 0.1.6, 0.x = not yet production-ready)
+- Split view: editor on the left, live preview on the right (mobile: toggle labels)
+- Toolbar: bold, italic, underline, strikethrough, inline code, code block,
+  highlight (==), sub/superscript, H1–H3, list, task list, table, quote,
+  horizontal rule, link, image, clear document, page break
+- Shortcuts: Ctrl/Cmd+B (bold), Ctrl/Cmd+I (italic), Ctrl/Cmd+K (link),
+  Ctrl/Cmd+Z (undo), Ctrl/Cmd+P (print with A4 preview)
+- Autosave to localStorage, file import/export (.md);
+  with the File System Access API (Chromium) export saves directly to the open file
+- A4 page view (button `A4`) with real page breaks + print stylesheet
+  for PDF export; mobile: swipe gesture editor/preview
+- Task list (`- [ ]` / `- [x]`, checkbox clickable in the preview),
+  heading IDs (`### Title {#id}`), highlight, sub/superscript
+- Dark mode via `prefers-color-scheme`
 
 ## Tests
 ```bash
 node --test
 ```
 
-## Plattform-Strategie
-- **Linux**: Browser (heute)
-- **Windows**: PWA oder Tauri-Wrapper um dieselbe Basis
-- **Mobile**: PWA (responsive, Touch-Targets ≥ 40 px)
+## Platform strategy
+- **Linux**: browser (today)
+- **Windows**: PWA or Tauri wrapper around the same base
+- **Mobile**: PWA (responsive, touch targets >= 40 px)
 
-## Struktur
+## Structure
 ```
-index.html       Layout + Toolbar
-css/style.css    Styles, responsive, Dark Mode
-js/markdown.js   Mini Markdown-Parser (testbar via node)
-js/app.js        State, Toolbar, Autosave, Import/Export
-tests/           Parser-Unit-Tests (node --test)
+index.html       Layout + toolbar
+css/style.css    Styles, responsive, dark mode
+js/markdown.js   Mini Markdown parser (testable via node)
+js/app.js        State, toolbar, autosave, import/export
+tests/           Parser unit tests (node --test)
 ```

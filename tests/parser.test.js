@@ -4,15 +4,15 @@ const assert = require('node:assert');
 const { parse, inline } = require('../js/markdown.js');
 
 test('headings h1-h3', () => {
-  assert.strictEqual(parse('# Titel'), '<h1>Titel</h1>');
+  assert.strictEqual(parse('# Title'), '<h1>Title</h1>');
   assert.strictEqual(parse('## Sub'), '<h2>Sub</h2>');
   assert.strictEqual(parse('### Subsub'), '<h3>Subsub</h3>');
 });
 
 test('bold / italic / strikethrough', () => {
-  assert.strictEqual(inline('**fett**'), '<strong>fett</strong>');
-  assert.strictEqual(inline('*kursiv*'), '<em>kursiv</em>');
-  assert.strictEqual(inline('~~weg~~'), '<del>weg</del>');
+  assert.strictEqual(inline('**bold**'), '<strong>bold</strong>');
+  assert.strictEqual(inline('*italic*'), '<em>italic</em>');
+  assert.strictEqual(inline('~~gone~~'), '<del>gone</del>');
 });
 
 test('inline code is not formatted inside', () => {
@@ -25,14 +25,14 @@ test('html escaping', () => {
 
 test('whitelisted inline html: underline', () => {
   assert.strictEqual(inline('<u>Text</u>'), '<u>Text</u>');
-  assert.strictEqual(parse('vor <u>fett **und**</u> nach'), '<p>vor <u>fett <strong>und</strong></u> nach</p>');
+  assert.strictEqual(parse('before <u>bold **and**</u> after'), '<p>before <u>bold <strong>and</strong></u> after</p>');
   assert.strictEqual(parse('- <u>a</u>'), '<ul><li><u>a</u></li></ul>');
 });
 
 test('whitelisted inline html: br', () => {
-  assert.strictEqual(inline('Zeile 1<br>Zeile 2'), 'Zeile 1<br>Zeile 2');
+  assert.strictEqual(inline('Line 1<br>Line 2'), 'Line 1<br>Line 2');
   assert.strictEqual(inline('a<br/>b'), 'a<br>b');
-  assert.strictEqual(parse('Zeile 1<br>Zeile 2'), '<p>Zeile 1<br>Zeile 2</p>');
+  assert.strictEqual(parse('Line 1<br>Line 2'), '<p>Line 1<br>Line 2</p>');
 });
 
 test('whitelist does not leak into code spans', () => {
@@ -41,17 +41,17 @@ test('whitelist does not leak into code spans', () => {
 });
 
 test('highlight ==text==', () => {
-  assert.strictEqual(inline('==wichtig=='), '<mark>wichtig</mark>');
+  assert.strictEqual(inline('==important=='), '<mark>important</mark>');
   assert.strictEqual(
-    parse('Das ist ==sehr wichtig== hier.'),
-    '<p>Das ist <mark>sehr wichtig</mark> hier.</p>'
+    parse('This is ==very important== here.'),
+    '<p>This is <mark>very important</mark> here.</p>'
   );
 });
 
-test('subscript ~x~ (nicht mit ~~Durchstreichen~~ verwechselt)', () => {
+test('subscript ~x~ (not confused with ~~strikethrough~~)', () => {
   assert.strictEqual(inline('H~2~O'), 'H<sub>2</sub>O');
-  assert.strictEqual(inline('~~weg~~'), '<del>weg</del>');
-  assert.strictEqual(inline('a ~ b ~ c'), 'a ~ b ~ c'); // Leerzeichen = kein Subskript
+  assert.strictEqual(inline('~~gone~~'), '<del>gone</del>');
+  assert.strictEqual(inline('a ~ b ~ c'), 'a ~ b ~ c'); // space = no subscript
 });
 
 test('superscript ^x^', () => {
@@ -64,19 +64,19 @@ test('heading id {#custom-id}', () => {
     parse('### My Great Heading {#custom-id}'),
     '<h3 id="custom-id">My Great Heading</h3>'
   );
-  assert.strictEqual(parse('## Ohne Id'), '<h2>Ohne Id</h2>');
-  assert.strictEqual(parse('# Falsch { id }'), '<h1>Falsch { id }</h1>'); // kein gültiges Id
+  assert.strictEqual(parse('## No Id'), '<h2>No Id</h2>');
+  assert.strictEqual(parse('# Wrong { id }'), '<h1>Wrong { id }</h1>'); // no valid ID
 });
 
 test('task list', () => {
   assert.strictEqual(
-    parse('- [ ] offen\n- [x] fertig'),
+    parse('- [ ] open\n- [x] done'),
     '<ul>' +
-    '<li class="task"><input type="checkbox" data-task> offen</li>' +
-    '<li class="task"><input type="checkbox" data-task checked> fertig</li>' +
+    '<li class="task"><input type="checkbox" data-task> open</li>' +
+    '<li class="task"><input type="checkbox" data-task checked> done</li>' +
     '</ul>'
   );
-  assert.strictEqual(parse('- normal'), '<ul><li>normal</li></ul>');
+  assert.strictEqual(parse('- plain'), '<ul><li>plain</li></ul>');
 });
 
 test('link and image', () => {
@@ -123,7 +123,7 @@ test('table', () => {
 });
 
 test('blockquote', () => {
-  assert.strictEqual(parse('> Zitat'), '<blockquote><p>Zitat</p></blockquote>');
+  assert.strictEqual(parse('> Quote'), '<blockquote><p>Quote</p></blockquote>');
 });
 
 test('horizontal rule', () => {
@@ -136,15 +136,15 @@ test('page break (block-level HTML, whitelisted)', () => {
     '<div class="page-break"></div>'
   );
   assert.strictEqual(
-    parse('Seite 1\n\n<div class="page-break"></div>\n\nSeite 2'),
-    '<p>Seite 1</p>\n<div class="page-break"></div>\n<p>Seite 2</p>'
+    parse('Page 1\n\n<div class="page-break"></div>\n\nPage 2'),
+    '<p>Page 1</p>\n<div class="page-break"></div>\n<p>Page 2</p>'
   );
-  // bricht einen laufenden Absatz ab
+  // breaks a running paragraph
   assert.strictEqual(
     parse('Text\n<div class="page-break"></div>\nMehr'),
     '<p>Text</p>\n<div class="page-break"></div>\n<p>Mehr</p>'
   );
-  // in Codeblock bleibt escaped
+  // stays escaped in code block
   assert.strictEqual(
     parse('```\n<div class="page-break"></div>\n```'),
     '<pre><code>&lt;div class=&quot;page-break&quot;&gt;&lt;/div&gt;</code></pre>'
@@ -152,7 +152,7 @@ test('page break (block-level HTML, whitelisted)', () => {
 });
 
 test('paragraph joins lines', () => {
-  assert.strictEqual(parse('zeile1\nzeile2'), '<p>zeile1 zeile2</p>');
+  assert.strictEqual(parse('line1\nline2'), '<p>line1 line2</p>');
 });
 
 test('empty input', () => {
