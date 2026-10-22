@@ -1,0 +1,11 @@
+.git
+_arch
+tests
+PLAN.md
+AGENTS.md
+README.md
+Dockerfile
+docker-compose.yml
+.dockerignore
+*.tar.gz
+.DS_Store

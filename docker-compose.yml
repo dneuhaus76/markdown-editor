@@ -1,0 +1,7 @@
+services:
+  markdown-editor:
+    build: .
+    image: markdown-editor:0.1.6
+    ports:
+      - "8080:80"
+    restart: unless-stopped

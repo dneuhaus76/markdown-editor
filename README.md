@@ -11,6 +11,13 @@ python3 -m http.server 8080
 ```
 Alternatively: open `index.html` directly in the browser.
 
+## Docker (tiny web service, nginx on Alpine, ~22 MB)
+```bash
+docker build -t markdown-editor:0.1.6 .
+docker run -d --name markdown-editor --restart unless-stopped -p 8080:80 markdown-editor:0.1.6
+# or: docker compose up -d
+# -> http://localhost:8080 (gzip, cache headers, health check)
+
 ## Features (Version 0.1.6, 0.x = not yet production-ready)
 - Split view: editor on the left, live preview on the right (mobile: toggle labels)
 - Toolbar: bold, italic, underline, strikethrough, inline code, code block,

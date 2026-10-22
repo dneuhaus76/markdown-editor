@@ -52,6 +52,11 @@ PLAN.md          Konsolidierter Plan + Backlog (Single Source of Truth für Road
 cd markdown-editor
 python3 -m http.server 8080   # Browser: http://localhost:8080
 node --test                   # Parser-Unit-Tests
+
+# Docker (Webservice, nginx/alpine, ~22 MB)
+docker build -t markdown-editor:0.1.6 .
+docker run -d --name markdown-editor --restart unless-stopped -p 8080:80 markdown-editor:0.1.6
+# oder: docker compose up -d
 ```
 
 ## Bekannte Grenzen (bewusste Annahmen)
