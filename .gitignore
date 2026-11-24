@@ -4,5 +4,8 @@ _arch/
 # Snapshots
 *.tar.gz
 
+# Secrets
+.env
+
 # OS
 .DS_Store

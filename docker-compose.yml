@@ -1,7 +1,19 @@
+# docker-compose.yml — markdown-editor
+# Naming: container_name == hostname == service
+
 services:
   markdown-editor:
     build: .
-    image: markdown-editor:0.1.6
+    image: dneuhaus76/markdown-editor:0.1.12
+    container_name: markdown-editor
+    hostname: markdown-editor
     ports:
       - "8080:80"
     restart: unless-stopped
+    networks:
+      - markdown-editor
+
+networks:
+  markdown-editor:
+    name: markdown-editor
+    driver: bridge
