@@ -1,3 +1,4 @@
+// Markdown-Editor – GPL-3.0 (see LICENSE)
 // Unit tests for the minimal Markdown parser (run: node --test tests/)
 const { test } = require('node:test');
 const assert = require('node:assert');
@@ -162,4 +163,98 @@ test('empty input', () => {
 test('non-string input throws', () => {
   assert.throws(() => parse(null), TypeError);
   assert.throws(() => parse(42), TypeError);
+});
+
+test('XSS: javascript: URLs are neutralized', () => {
+  assert.strictEqual(
+    inline('[klick](javascript:evil)'),
+    '<a href="#" target="_blank" rel="noopener">klick</a>'
+  );
+  assert.strictEqual(
+    inline('![x](javascript:steal)'),
+    '<img src="#" alt="x">'
+  );
+});
+
+test('XSS: safe URLs pass through', () => {
+  assert.strictEqual(
+    inline('[Text](https://ex.ch)'),
+    '<a href="https://ex.ch" target="_blank" rel="noopener">Text</a>'
+  );
+  assert.strictEqual(
+    inline('![Alt](img.png)'),
+    '<img src="img.png" alt="Alt">'
+  );
+  assert.strictEqual(
+    inline('[Mail](mailto:hi@ex.ch)'),
+    '<a href="mailto:hi@ex.ch" target="_blank" rel="noopener">Mail</a>'
+  );
+});
+
+test('underscore bold __text__ (alt syntax)', () => {
+  assert.strictEqual(inline('__bold__'), '<strong>bold</strong>');
+  assert.strictEqual(inline('__a__ __b__'), '<strong>a</strong> <strong>b</strong>');
+});
+
+test('underscore italic _text_ (alt syntax)', () => {
+  assert.strictEqual(inline('_italic_'), '<em>italic</em>');
+  assert.strictEqual(inline('_i_ _j_'), '<em>i</em> <em>j</em>');
+});
+
+test('bold-italic ***x*** and ___x___', () => {
+  assert.strictEqual(inline('***bold italic***'), '<strong><em>bold italic</em></strong>');
+  assert.strictEqual(inline('___bold italic___'), '<strong><em>bold italic</em></strong>');
+});
+
+test('underscore does not match inside identifiers', () => {
+  assert.strictEqual(inline('my_var_name stays'), 'my_var_name stays');
+  assert.strictEqual(inline('a_b_c'), 'a_b_c');
+  assert.strictEqual(inline('word__x__end'), 'word__x__end');
+});
+
+test('mixed alt syntax in one paragraph', () => {
+  assert.strictEqual(
+    inline('_italic_ und **bold**'),
+    '<em>italic</em> und <strong>bold</strong>'
+  );
+  assert.strictEqual(
+    inline('***bold italic*** und **extra bold**'),
+    '<strong><em>bold italic</em></strong> und <strong>extra bold</strong>'
+  );
+});
+
+test('list markers - * + are equivalent', () => {
+  assert.strictEqual(parse('- a\n* b\n+ c'), '<ul><li>a</li><li>b</li><li>c</li></ul>');
+  assert.strictEqual(
+    parse('- [ ] task\n* item2'),
+    '<ul><li class="task"><input type="checkbox" data-task> task</li><li>item2</li></ul>'
+  );
+});
+
+test('sanitizeUrl: data:text/html is neutralized', () => {
+  assert.strictEqual(
+    inline('[x](data:text/html;base64,PHNjcmlwdD4=)'),
+    '<a href="#" target="_blank" rel="noopener">x</a>'
+  );
+});
+
+test('sanitizeUrl: protocol-relative URLs pass (relative path)', () => {
+  assert.strictEqual(
+    inline('[x](//cdn.example.com/file.js)'),
+    '<a href="//cdn.example.com/file.js" target="_blank" rel="noopener">x</a>'
+  );
+});
+
+test('table cells support inline formatting', () => {
+  const md = '| **Bold** | *italic* |\n|---|---|\n| `code` | ~~gone~~ |';
+  const html = parse(md);
+  assert.match(html, /<th><strong>Bold<\/strong><\/th>/);
+  assert.match(html, /<th><em>italic<\/em><\/th>/);
+  assert.match(html, /<td><code>code<\/code><\/td>/);
+  assert.match(html, /<td><del>gone<\/del><\/td>/);
+});
+
+test('blockquote with nested list', () => {
+  const html = parse('> - item1\n> - item2');
+  assert.match(html, /<blockquote><ul><li>item1<\/li><li>item2<\/li><\/ul><\/blockquote>/);
 });

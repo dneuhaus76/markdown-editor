@@ -9,25 +9,30 @@
 </head>
 <body>
   <header class="toolbar" role="toolbar" aria-label="Formatting">
-    <button data-action="clear" title="Clear document" style="font-size:12px;">&#10005;</button>
+    <button id="btn-burger" title="More tools" aria-expanded="false">&#9776;</button>
+    <span class="sep"></span>
+    <button data-action="clear" title="Clear document" style="font-size:12px;">&#8999;</button>
     <button id="btn-import" title="Open .md file">&#8682;</button>
-    <button id="btn-export" title="Save as .md">&#8683;</button>
+    <button id="btn-export" title="Save as .md">&#8681;</button>
     <span class="sep"></span>
     <button data-action="bold" title="Bold (Ctrl+B)"><b>B</b></button>
     <button data-action="italic" title="Italic (Ctrl+I)"><i>I</i></button>
     <button data-action="underline" title="Underline"><u>U</u></button>
-    <button data-action="strike" title="Strikethrough"><s>S</s></button>
-    <button data-action="code" title="Inline code">&lt;/&gt;</button>
-    <button data-action="codeblock" title="Code block">{ }</button>
+    <span class="spacer"></span>
+    <button id="btn-help" title="Help / About">?</button>
+    <input type="file" id="file-input" accept=".md,.markdown,text/markdown" hidden>
+  <div class="toolbar-panel" id="toolbar-panel" hidden>
     <button data-action="highlight" title="Highlight (==text==)" style="font-size:12px;">HL</button>
-    <button data-action="sup" title="Superscript (X^2^)">X<sup>2</sup></button>
-    <button data-action="sub" title="Subscript (H~2~O)">X<sub>2</sub></button>
-    <span class="sep"></span>
+    <button data-action="strike" title="Strikethrough"><s>S</s></button>
     <button data-action="h1" title="Heading 1">H1</button>
     <button data-action="h2" title="Heading 2">H2</button>
     <button data-action="h3" title="Heading 3">H3</button>
-    <span class="sep"></span>
+    <button data-action="code" title="Inline code">&lt;/&gt;</button>
+    <button data-action="codeblock" title="Code block">{ }</button>
     <button data-action="table" title="Table">&#9633;</button>
+    <button data-action="mermaid" title="Mermaid diagram">&#128200;</button>
+    <button data-action="sup" title="Superscript (X^2^)">X<sup>2</sup></button>
+    <button data-action="sub" title="Subscript (H~2~O)">X<sub>2</sub></button>
     <button data-action="task" title="Task list (- [ ] task)">&#9745;</button>
     <button data-action="ul" title="List">&#8226;&ndash;</button>
     <button data-action="indent" title="Indent" style="font-size:12px;">&#8677;</button>
@@ -36,14 +41,10 @@
     <button data-action="link" title="Link [text](url)">&#128279;</button>
     <button data-action="image" title="Image ![alt](url)">&#128444;</button>
     <button data-action="hr" title="Horizontal rule (---)" style="font-size:12px;">&#8212;</button>
-    <span class="sep"></span>
     <button data-action="br" title="Line break (br)" style="font-size:12px;">br</button>
     <button data-action="pagebreak" title="Page break (new page when printing)" style="font-size:12px;">PB</button>
-    <span class="sep"></span>
     <button id="btn-a4" title="A4 page view (show page end)">A4</button>
-    <span class="spacer"></span>
-    <button id="btn-help" title="Help / About">?</button>
-    <input type="file" id="file-input" accept=".md,.markdown,text/markdown" hidden>
+  </div>
   </header>
 
   <main class="panes">
@@ -98,8 +99,15 @@
     </div>
   </div>
 
-  <script src="js/markdown.js"></script>
-  <script src="js/app.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script defer src="js/config.js"></script>
+  <script defer src="js/markdown.js"></script>
+  <script defer src="js/transform.js"></script>
+  <script defer src="js/preview.js"></script>
+  <script defer src="js/editor-io.js"></script>
+  <script defer src="js/search.js"></script>
+  <script defer src="js/ui.js"></script>
+  <script defer src="js/app.js"></script>
   <script>
     // Fallback: VERSION-Datei laden, wenn Build-Injection nicht stattfand (lokal)
     document.addEventListener('DOMContentLoaded', () => {

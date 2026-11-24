@@ -7,6 +7,16 @@ function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// Sanitize URL: positive list. Only http(s), mailto, data:image pass.
+// Any other scheme (javascript:, vbscript:, file:) is neutralized to '#'.
+// Relative paths (no scheme) are allowed.
+function sanitizeUrl(url) {
+  const trimmed = url.trim();
+  if (/^(https?:|mailto:|data:image\/)/i.test(trimmed)) return trimmed;
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) return trimmed; // relative path
+  return '#'; // unsafe scheme → neutralize
+}
+
 // Inline formatting. Code spans run first so their content is not formatted.
 function inline(text) {
   let out = escapeHtml(text);
@@ -19,10 +29,17 @@ function inline(text) {
   // Whitelisted inline HTML (restored after escaping; code spans are already protected).
   out = out.replace(/&lt;u&gt;/g, '<u>').replace(/&lt;\/u&gt;/g, '</u>');
   out = out.replace(/&lt;br\s*\/\s*&gt;|&lt;br&gt;/g, '<br>');
-  out = out.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, '<img src="$2" alt="$1">');
-  out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  out = out.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_, alt, url) => '<img src="' + sanitizeUrl(url) + '" alt="' + alt + '">');
+  out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, text, url) => '<a href="' + sanitizeUrl(url) + '" target="_blank" rel="noopener">' + text + '</a>');
+  // Bold-italic first (***…*** / ___…___), then bold (**…** / __…), then italic.
+  out = out.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+  out = out.replace(/(^|[^A-Za-z0-9_*])___([^_]+)___/g, '$1<strong><em>$2</em></strong>');
   out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/(^|[^A-Za-z0-9_*])__([^_]+)__(?![A-Za-z0-9])/g, '$1<strong>$2</strong>');
   out = out.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  // Underscore italic: only at a word boundary (no letter/digit before or after),
+  // so identifiers like my_var_name stay untouched.
+  out = out.replace(/(^|[^A-Za-z0-9_])_([^_\n]+)_(?![A-Za-z0-9])/g, '$1<em>$2</em>');
   out = out.replace(/~~([^~]+)~~/g, '<del>$1</del>');
   out = out.replace(/==([^=]+)==/g, '<mark>$1</mark>');
   // Sub/superscript: after ~~strikethrough~~ so single tildas do not collide.
@@ -72,13 +89,18 @@ function parse(md) {
   while (i < lines.length) {
     const line = lines[i];
 
-    // Fenced code block
+    // Fenced code block (language tag: mermaid → diagram, else plain code)
     if (/^```/.test(line)) {
+      const lang = line.slice(3).trim().toLowerCase();
       const buf = [];
       i++;
       while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
       i++; // skip closing fence (or EOF)
-      out.push('<pre><code>' + escapeHtml(buf.join('\n')) + '</code></pre>');
+      if (lang === 'mermaid') {
+        out.push('<div class="mermaid">\n' + escapeHtml(buf.join('\n')) + '\n</div>');
+      } else {
+        out.push('<pre><code>' + escapeHtml(buf.join('\n')) + '</code></pre>');
+      }
       continue;
     }
 
