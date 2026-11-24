@@ -1,0 +1,106 @@
+name: Docker Publish
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'tests/**'
+      - '_arch/**'
+      - 'ToDo.md'
+      - 'README.md'
+
+env:
+  REGISTRY: docker.io
+  IMAGE: dneuhaus76/markdown-editor
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version & build date
+        id: ver
+        run: |
+          echo "version=$(tr -d '[:space:]' < VERSION)" >> "$GITHUB_OUTPUT"
+          echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push (amd64 + arm64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            VERSION=${{ steps.ver.outputs.version }}
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ steps.ver.outputs.date }}
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.ver.outputs.version }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=registry,ref=${{ env.IMAGE }}:buildcache
+          cache-to: type=registry,ref=${{ env.IMAGE }}:buildcache,mode=max
+
+      - name: Update Docker Hub description
+        run: |
+          jq -n --arg desc "$(cat README.md)" '{full_description: $desc}' | \
+            curl -s -X PATCH \
+              -u "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              -d @- \
+              "https://hub.docker.com/v2/repositories/dneuhaus76/markdown-editor/"
+
+  # Der dedizierte Benachrichtigungs-Job
+  notify:
+    needs: [build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Status
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TGACTION_CHAT_ID: ${{ secrets.TGACTION_CHAT_ID }}
+          TGACTION_CHANNEL_ID: ${{ secrets.TGACTION_CHANNEL_ID }}
+          RESULT: ${{ needs.build.result }}
+        run: |
+          case "${RESULT}" in
+            success)
+              ICON="✅"
+              TEXT="SUCCESS"
+              ;;
+            failure)
+              ICON="❌"
+              TEXT="FAILED"
+              ;;
+            cancelled)
+              ICON="⚠️"
+              TEXT="CANCELLED"
+              ;;
+            *)
+              ICON="⚪"
+              TEXT="UNKNOWN"
+              ;;
+          esac
+
+          MESSAGE="${ICON} *Build Result:* ${TEXT}%0A*Image:* ${{ env.IMAGE }}%0A*User:* ${{ github.actor }}"
+
+          curl -s -f -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            -d "chat_id=${TGACTION_CHANNEL_ID}" \
+            -d "text=${MESSAGE}" \
+            -d "parse_mode=Markdown"
