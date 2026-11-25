@@ -75,7 +75,7 @@ jobs:
       - name: Send Telegram Status
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TGACTION_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           RESULT: ${{ needs.build.result }}
         run: |
           case "${RESULT}" in
