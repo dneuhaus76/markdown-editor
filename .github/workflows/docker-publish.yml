@@ -62,7 +62,7 @@ jobs:
         run: |
           jq -n --arg desc "$(cat README.md)" '{full_description: $desc}' | \
             curl -s -X PATCH \
-              -u "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" \
+              -u "${{ vars.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" \
               -H "Content-Type: application/json" \
               -d @- \
               "https://hub.docker.com/v2/repositories/dneuhaus76/markdown-editor/"
@@ -76,7 +76,7 @@ jobs:
       - name: Send Telegram Status
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          TG_CHAT_ID: ${{ vars.TG_CHAT_ID }}
           RESULT: ${{ needs.build.result }}
         run: |
           case "${RESULT}" in
