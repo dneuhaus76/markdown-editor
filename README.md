@@ -12,7 +12,7 @@ Can be run in a ~ 22 MB Docker image, zero runtime dependencies (Mermaid loaded 
 
 Toggle the **A4** button to see your document with real page breaks at exactly 210 × 297 mm. The print stylesheet maps 1:1 to physical paper – no surprises when you hit `Ctrl+P`. Ideal for documents that must look right on paper (reports, letters, handouts).
 
-![Screenshot](_assets/screenshot.jpg)
+![Screenshot](https://raw.githubusercontent.com/dneuhaus76/markdown-editor/main/_assets/screenshot.jpg)
 
 <div class="page-break"></div>
 

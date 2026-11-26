@@ -4,7 +4,7 @@
 services:
   markdown-editor:
     build: .
-    image: dneuhaus76/markdown-editor:0.1.12
+    image: dneuhaus76/markdown-editor
     container_name: markdown-editor
     hostname: markdown-editor
     ports:
