@@ -24,26 +24,37 @@
   <div class="toolbar-panel" id="toolbar-panel" hidden>
     <button data-action="highlight" title="Highlight (==text==)" style="font-size:12px;">HL</button>
     <button data-action="strike" title="Strikethrough"><s>S</s></button>
+    <button data-action="quote" title="Quote">&#10077;</button>
     <button data-action="h1" title="Heading 1">H1</button>
     <button data-action="h2" title="Heading 2">H2</button>
     <button data-action="h3" title="Heading 3">H3</button>
     <button data-action="code" title="Inline code">&lt;/&gt;</button>
     <button data-action="codeblock" title="Code block">{ }</button>
-    <button data-action="table" title="Table">&#9633;</button>
-    <button data-action="mermaid" title="Mermaid diagram">&#128200;</button>
+    <button data-action="table" title="Table (template)">&#9633;</button>
+    <button data-action="mermaid" title="Mermaid diagram (template)">&#128200;</button>
     <button data-action="sup" title="Superscript (X^2^)">X<sup>2</sup></button>
     <button data-action="sub" title="Subscript (H~2~O)">X<sub>2</sub></button>
     <button data-action="task" title="Task list (- [ ] task)">&#9745;</button>
-    <button data-action="ul" title="List">&#8226;&ndash;</button>
+    <button data-action="ul" title="List (ul)">&#8226;&ndash;</button>
+    <button data-action="ol" title="List (ol)">1.</button>
     <button data-action="indent" title="Indent" style="font-size:12px;">&#8677;</button>
     <button data-action="outdent" title="Outdent" style="font-size:12px;">&#8676;</button>
-    <button data-action="quote" title="Quote">&#10077;</button>
     <button data-action="link" title="Link [text](url)">&#128279;</button>
     <button data-action="image" title="Image ![alt](url)">&#128444;</button>
     <button data-action="hr" title="Horizontal rule (---)" style="font-size:12px;">&#8212;</button>
     <button data-action="br" title="Line break (br)" style="font-size:12px;">br</button>
     <button data-action="pagebreak" title="Page break (new page when printing)" style="font-size:12px;">PB</button>
     <button id="btn-a4" title="A4 page view (show page end)">A4</button>
+    <label class="cols-config">
+      <span>cols:</span>
+      <select id="cols-select">
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5" selected>5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+      </select>
+    </label>
   </div>
   </header>
 

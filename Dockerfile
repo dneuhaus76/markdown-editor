@@ -3,7 +3,7 @@
 FROM nginx:1.27-alpine
 
 # ===== Buildzeit-Variablen (für dynamische Metadaten) =====
-ARG VERSION=0.1.12
+ARG VERSION=0.1.14
 ARG VCS_REF=dev
 ARG BUILD_DATE
 ARG TARGETARCH

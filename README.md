@@ -1,13 +1,16 @@
 # Markdown Editor
 
-A tiny, fast Markdown editor with live preview (A browser app). No framework. No build step. No dependencies. Just open `index.html` and write.
-
-Can be run in a ~ 22 MB Docker image, zero runtime dependencies (Mermaid loaded from CDN).
+A tiny, fast Markdown editor with live preview and A4 page preview (A browser app). No framework. No build step. No dependencies. Just open `index.html` and write.
 
 ---
 
 ## Key Features
 
+* Can be run directy by starting `index.html` in any modern browser. No installation needed
+* Can be run on Mobiles
+- Can be run in a Docker image, zero runtime dependencies (Mermaid loaded from CDN).
+  - alpine Images built on dockerhub (amd64,arm64)
+<br>
 ### A4 Page View & Print-to-PDF
 
 Toggle the **A4** button to see your document with real page breaks at exactly 210 × 297 mm. The print stylesheet maps 1:1 to physical paper – no surprises when you hit `Ctrl+P`. Ideal for documents that must look right on paper (reports, letters, handouts).
@@ -83,7 +86,11 @@ Follows `prefers-color-scheme`. No toggle needed – it just works.
 
 ## Start
 
-### Linux (no Docker)
+### no Docker
+
+Simply open `index.html` in any modern browser.
+
+Or
 
 ```bash
 cd markdown-editor
@@ -91,17 +98,18 @@ python3 -m http.server 8080
 # → http://localhost:8080
 ```
 
-Or simply open `index.html` in any modern browser.
+### Docker (Images on dockerhub)
 
-### Docker (nginx on Alpine, ~22 MB)
+Simply download from dockerhub und start:
+`docker run -d -p 8080:80 --name markdown-editor dneuhaus76/markdown-editor`
+
+Or (build your own)
 
 ```bash
-docker build -t markdown-editor:0.1.12 .
-docker run -d --name markdown-editor --restart unless-stopped -p 8080:80 markdown-editor:0.1.12
+docker build -t markdown-editor:0.x .
+docker run -d --name markdown-editor --restart unless-stopped -p 8080:80 markdown-editor:0.x
 # → http://localhost:8080 (gzip, cache headers, health check)
 ```
-
-Or: `docker compose up -d`
 
 ---
 
@@ -112,9 +120,9 @@ index.html       Layout + toolbar
 css/style.css    Styles, responsive, dark mode, A4 print, status bar
 js/markdown.js   Mini Markdown parser (testable via node)
 js/app.js        State, toolbar, autosave, import/export, images, search, Mermaid
-tests/           Parser unit tests (node --test)
-Dockerfile       nginx on Alpine
-docker-compose.yml
+tests/           Parser unit tests (not needed by application)
+Dockerfile       nginx on Alpine (not needed by application)
+docker-compose.yml (not needed by application)
 ```
 
 ---

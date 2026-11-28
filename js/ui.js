@@ -71,6 +71,7 @@
       h2:        () => prefixLines('## '),
       h3:        () => prefixLines('### '),
       ul:        () => prefixLines('- '),
+      ol:        () => prefixLines('1. '),
       indent:    () => indentLines(1),
       outdent:   () => indentLines(-1),
       quote:     () => prefixLines('> '),
@@ -114,6 +115,24 @@
       if (fn) fn();
       closePanel();
     });
+
+    // ---------- Column count config ----------
+    const colsSelect = document.getElementById('cols-select');
+    function setCols(n) {
+      n = Math.min(7, Math.max(3, parseInt(n, 10) || 5));
+      toolbarPanel.style.setProperty('--cols', String(n));
+      try { localStorage.setItem(MDConfig.COLS_KEY, String(n)); } catch (e) { /* non-fatal */ }
+    }
+    colsSelect.addEventListener('change', () => setCols(colsSelect.value));
+    try {
+      const saved = parseInt(localStorage.getItem(MDConfig.COLS_KEY), 10);
+      if (saved >= 3 && saved <= 7) {
+        colsSelect.value = String(saved);
+        setCols(saved);
+      } else {
+        setCols(5);
+      }
+    } catch (e) { setCols(5); }
 
     btnBurger.addEventListener('click', () => {
       const open = toolbarPanel.hidden;
@@ -262,7 +281,7 @@
       const text = editor.value;
       const t = text.trim();
       const words = t ? t.split(/\s+/).length : 0;
-      statusBar.textContent = words + ' Wörter · ' + text.length + ' Zeichen';
+      statusBar.textContent = words + ' Words · ' + text.length + ' Characters';
     }
 
     // Expose to ctx.
